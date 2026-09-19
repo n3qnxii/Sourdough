@@ -121,3 +121,14 @@
 .qrUploadCard{margin:14px 0;padding:16px;border:1px dashed #cdb397;border-radius:18px;background:#f8eee2;display:grid;grid-template-columns:1fr auto;gap:10px 14px;align-items:center}.qrUploadCard b{display:block;color:var(--brown);font-size:15px}.qrUploadCard small{display:block;color:var(--muted);margin-top:4px;line-height:1.5}.qrUploadBtn{display:inline-flex!important;align-items:center;justify-content:center;min-height:44px;padding:0 15px;border-radius:13px;background:var(--brown)!important;color:#fff!important;font-weight:800;cursor:pointer}.qrUploadBtn input{display:none}.qrImagePreview{grid-column:1/-1;display:flex;justify-content:center}.qrImagePreview img{width:170px;height:170px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:18px;padding:8px;box-shadow:0 8px 20px #5b382312}.softDanger{grid-column:1/-1;justify-self:center;border:1px solid #e5b7af;background:#fff1ef;color:#a4473b;border-radius:12px;padding:9px 14px;font-weight:800}.settingsQR{background:#fffdf9}.settingsQR img.customSettingsQR{width:150px;height:150px;object-fit:contain;border-radius:14px}
 .categoryModalBox{width:min(470px,92vw);padding:28px;background:linear-gradient(155deg,#fffdf9,#f9efe4);border:1px solid #e4d1bd;box-shadow:0 30px 80px #2e1d1338}.categoryModalBox h2{margin:5px 0 6px;color:var(--brown);font-size:27px}.modalLead{color:var(--muted);margin:0 0 20px}.categoryNameField{display:grid;gap:8px;color:var(--brown);font-weight:800}.categoryNameField input{height:54px;border:1px solid #d9c3ae;background:#fff;border-radius:15px;padding:0 15px;font-size:16px;outline:none}.categoryNameField input:focus{border-color:#8d6545;box-shadow:0 0 0 4px #8d65451a}.categoryModalActions{display:grid;grid-template-columns:1fr 1.35fr;gap:10px;margin-top:22px}.categoryModalActions button{height:52px;border-radius:14px;border:1px solid #dfd0c2;background:#f4e9de;color:var(--brown);font-weight:850}.categoryModalActions .primary{border:0;background:linear-gradient(135deg,#70492f,#4e301f);color:#fff}.categoryModalActions svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;margin-right:5px;vertical-align:middle}
 #categoryManager{gap:9px}#categoryManager button{border:1px solid #ddc8b4;background:#fffaf4;color:#65442f;border-radius:999px;padding:10px 15px;font-weight:800;transition:.18s ease}#categoryManager button:hover{transform:translateY(-1px);background:#f2e3d4;border-color:#c8a98c}
+
+/* ===== V5.1: fixed POS viewport + sell status text ===== */
+html, body {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+#salePulse,
+#salePulse b {
+  color: #1f1f1f !important;
+}
