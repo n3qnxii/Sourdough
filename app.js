@@ -167,3 +167,13 @@ function startSuccessCountdown(){
   if(backdrop)backdrop.onclick=()=>setHeldDrawer(false);
 })();
 
+/* ===== V5.1: prevent pinch/double-tap zoom on touch devices ===== */
+['gesturestart','gesturechange','gestureend'].forEach(function(type){
+  document.addEventListener(type,function(e){ e.preventDefault(); },{passive:false});
+});
+let lastTouchEnd=0;
+document.addEventListener('touchend',function(e){
+  const now=Date.now();
+  if(now-lastTouchEnd<=300){ e.preventDefault(); }
+  lastTouchEnd=now;
+},{passive:false});
