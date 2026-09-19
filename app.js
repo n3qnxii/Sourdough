@@ -2,9 +2,26 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], m
 const old=JSON.parse(localStorage.getItem('sdpos_v2')||'null');
 const baseAccounts=[{u:'owner',p:'1234',name:'เจ้าของ',role:'owner'},{u:'staff1',p:'1111',name:'Staff 1',role:'staff'},{u:'staff2',p:'2222',name:'Staff 2',role:'staff'},{u:'staff3',p:'3333',name:'Staff 3',role:'staff'}];
 const baseCats=[{id:'sourdough',name:'Sourdough'},{id:'bread',name:'ขนมปัง'},{id:'bakery',name:'เบเกอรี่'},{id:'food',name:'ของทานเล่น'}];
-const baseProducts=old?.products||[]; baseProducts.forEach(p=>{if(p.prep===undefined)p.prep=p.desc||''});
+const defaultProducts=[
+{id:'classic',name:'Classic Sourdough',cat:'sourdough',price:150,half:80,halfCost:0,halfName:'Classic Sourdough ครึ่งโลฟ',cost:0,stock:20,prep:'Japanese flour',desc:'Japanese flour',img:'assets/classic.svg',halfImg:'assets/classic.svg'},
+{id:'wholewheat',name:'Whole wheat Sourdough',cat:'sourdough',price:180,half:100,halfCost:0,halfName:'Whole wheat Sourdough ครึ่งโลฟ',cost:0,stock:20,prep:'Japanese flour + 30% German whole wheat',desc:'Bestseller · Japanese flour + 30% German whole wheat',img:'assets/wholewheat.svg',halfImg:'assets/wholewheat.svg'},
+{id:'multigrain',name:'Multigrain Sourdough',cat:'sourdough',price:190,half:110,halfCost:0,halfName:'Multigrain Sourdough ครึ่งโลฟ',cost:0,stock:20,prep:'',desc:'',img:'assets/multigrain.svg',halfImg:'assets/multigrain.svg'},
+{id:'sesame',name:'Black Sesame Sourdough',cat:'sourdough',price:190,half:110,halfCost:0,halfName:'Black Sesame Sourdough ครึ่งโลฟ',cost:0,stock:20,prep:'',desc:'',img:'assets/sesame.svg',halfImg:'assets/sesame.svg'},
+{id:'cranberry',name:'Cranberry Sourdough',cat:'sourdough',price:190,half:110,halfCost:0,halfName:'Cranberry Sourdough ครึ่งโลฟ',cost:0,stock:20,prep:'',desc:'',img:'assets/cranberry.svg',halfImg:'assets/cranberry.svg'},
+{id:'walnut',name:'Cranberry Walnuts Sourdough',cat:'sourdough',price:240,half:130,halfCost:0,halfName:'Cranberry Walnuts Sourdough ครึ่งโลฟ',cost:0,stock:20,prep:'',desc:'',img:'assets/walnut.svg',halfImg:'assets/walnut.svg'},
+{id:'milk',name:'Fresh milk bread',cat:'bread',price:100,half:null,halfCost:0,halfName:'',cost:0,stock:20,prep:'',desc:'',img:'assets/milk.svg',halfImg:''},
+{id:'wheatbread',name:'Whole wheat bread',cat:'bread',price:120,half:null,halfCost:0,halfName:'',cost:0,stock:20,prep:'',desc:'',img:'assets/wheatbread.svg',halfImg:''},
+{id:'nosugar',name:'Whole wheat no sugar',cat:'bread',price:120,half:null,halfCost:0,halfName:'',cost:0,stock:20,prep:'',desc:'',img:'assets/nosugar.svg',halfImg:''},
+{id:'brownie',name:'Brownie',cat:'bakery',price:10,half:null,halfCost:0,halfName:'',cost:0,stock:30,prep:'',desc:'',img:'assets/brownie.svg',halfImg:''},
+{id:'buttercookie',name:'Butter cookie',cat:'bakery',price:10,half:null,halfCost:0,halfName:'',cost:0,stock:30,prep:'',desc:'',img:'assets/buttercookie.svg',halfImg:''},
+{id:'graincookie',name:'Multigrain cookie',cat:'bakery',price:15,half:null,halfCost:0,halfName:'',cost:0,stock:30,prep:'',desc:'',img:'assets/graincookie.svg',halfImg:''},
+{id:'fries',name:'French fries',cat:'food',price:25,half:null,halfCost:0,halfName:'',cost:0,stock:30,prep:'Small',desc:'Small',img:'assets/fries.svg',halfImg:''}
+];
+const baseProducts=(old?.products?.length?old.products:structuredClone(defaultProducts)); baseProducts.forEach(p=>{if(p.prep===undefined)p.prep=p.desc||''});
 let db=JSON.parse(localStorage.getItem('sdpos_v32')||'null')||{accounts:baseAccounts,categories:old?.categories||baseCats,products:baseProducts,orders:old?.orders||[],promptpay:old?.promptpay||'',shopName:'Sourdough',printerWidth:80,held:[],preorders:[],qrImage:''}; db.shopName=db.shopName||'Sourdough'; db.printerWidth=db.printerWidth||80;
 for(const k of ['accounts','categories','products','orders','held','preorders']) if(!db[k]) db[k]=[];
+// V5.0 migration: older builds could save an empty product list. Seed the real shop menu only when there are no products, without overwriting an existing/custom menu.
+if(!db.products.length){db.products=structuredClone(defaultProducts);localStorage.setItem('sdpos_v32',JSON.stringify(db));}
 let cart=[],currentUser=null,currentCat='all',method='cash',received='0',currentOrderTab='history',preCart=[];
 const save=()=>localStorage.setItem('sdpos_v32',JSON.stringify(db)); const total=()=>cart.reduce((a,x)=>a+x.qty*x.price,0); const qty=()=>cart.reduce((a,x)=>a+x.qty,0); const dateKey=d=>{let x=new Date(d),y=x.getFullYear(),m=String(x.getMonth()+1).padStart(2,'0'),day=String(x.getDate()).padStart(2,'0');return `${y}-${m}-${day}`};
 let audioCtx=null;function clickSound(freq=520,dur=.045){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=freq;g.gain.value=.035;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);o.stop(audioCtx.currentTime+dur)}catch(e){}}
@@ -149,3 +166,4 @@ function startSuccessCountdown(){
   if(close)close.onclick=()=>setHeldDrawer(false);
   if(backdrop)backdrop.onclick=()=>setHeldDrawer(false);
 })();
+
