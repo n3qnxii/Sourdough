@@ -1036,3 +1036,75 @@ html:has(#staffEditorModal:not(.hidden)),body:has(#staffEditorModal:not(.hidden)
 
 /* v5.73 manage deletion + staff add */
 .staffPanelHead{display:flex!important;align-items:center!important;gap:12px!important}.staffPanelCopy{min-width:0;display:grid;gap:2px}.staffAddIconBtn{margin-left:auto!important;width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;border-radius:13px!important;background:#704329!important;color:#fff!important;display:grid!important;place-items:center!important;box-shadow:0 7px 16px rgba(112,67,41,.18)!important}.staffAddIconBtn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}.deleteProductModal{z-index:2600!important}.deleteProductCard{position:relative;width:min(470px,calc(100vw - 28px))!important;text-align:center!important;padding:30px!important;border-radius:26px!important;background:linear-gradient(180deg,#fffdfa,#fbf2e9)!important;border:1px solid #ead5c3!important}.deleteProductIcon{width:62px;height:62px;border-radius:20px;background:#fff0ee;color:#bd4339;display:grid;place-items:center;margin:2px auto 14px}.deleteProductIcon svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.deleteProductCard h2{margin:0 0 14px}.deleteProductCard>p{color:#806b5d;line-height:1.65;margin:14px auto 20px;max-width:390px}.deleteProductTarget{display:flex;align-items:center;gap:13px;padding:11px 14px;background:#fff;border:1px solid #eaded4;border-radius:17px;text-align:left}.deleteProductTarget img{width:58px;height:58px;border-radius:14px;object-fit:cover;background:#f5eee8}.deleteProductTarget b{font-size:16px}.deleteProductActions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.deleteProductActions button{min-height:50px!important;border-radius:14px!important}.deleteProductActions .danger{display:flex!important;align-items:center;justify-content:center;gap:8px}.deleteProductActions svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9}@media(max-width:520px){.deleteProductCard{padding:25px 18px!important}.deleteProductActions{grid-template-columns:1fr}}
+\n/* v5.74 — payment viewport fit + reliable store-logo picker */\n#payModal{overflow:hidden!important;padding:10px!important}\n#payModal .payBox{width:min(520px,calc(100vw - 20px))!important;max-height:calc(100dvh - 20px)!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:18px 20px!important}\n#payModal .payTotal{font-size:38px!important;line-height:1!important;margin:4px 0 7px!important}\n#payModal .method{margin:9px 0!important;gap:10px!important}\n#payModal .method button{min-height:66px!important;padding:10px 12px!important}\n#payModal .method button svg{width:31px!important;height:31px!important}\n#payModal .method button[data-method="cash"] svg{width:35px!important;height:35px!important}\n#payModal .cashInputWrap{padding:9px 13px!important;margin-bottom:6px!important}\n#payModal .cashInputWrap input{font-size:20px!important}\n#payModal .cashDisplay,#payModal .change{padding:10px 14px!important;margin:6px 0!important}\n#payModal .cashDisplay b,#payModal .change b{font-size:21px!important}\n#payModal .quickCash{gap:7px!important;margin:6px 0!important}\n#payModal .quickCash button{min-height:43px!important;padding:9px!important;font-size:15px!important}\n#payModal #confirmPay{min-height:50px!important;margin-top:8px!important}\n#payModal .payTaxSummary{margin:4px 0!important;padding:7px 10px!important}\n.shopLogoUpload{position:relative!important;cursor:pointer!important;pointer-events:auto!important}\n.shopLogoUpload input{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0!important;cursor:pointer!important;display:block!important;z-index:2!important}\n.shopLogoPreview{pointer-events:auto!important}\n@media(max-height:760px){#payModal .payBox{padding:12px 16px!important}#payModal .payTotal{font-size:32px!important}#payModal .method button{min-height:56px!important}#payModal .quickCash button{min-height:38px!important;padding:7px!important}#payModal .cashInputWrap span{display:none!important}}\n/* v5.75 — paid pre-order completion + temporarily unavailable product cue */
+.orderPreBadge{display:inline-flex;align-items:center;gap:6px;margin-left:8px;padding:5px 9px;border-radius:999px;background:#fff1df;color:#8a542f;font-size:11px;font-weight:850;vertical-align:middle}.orderPreBadge svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8}
+.heldPaidRow{display:flex;align-items:center;gap:8px;margin-top:10px}.heldPaidState{min-width:0;flex:1;display:flex;align-items:center;gap:7px;padding:9px 10px;border-radius:12px;background:#eaf4fb;color:#397296;font-size:11px;font-weight:800}.heldPaidState svg,.heldCompleteMini svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}.heldCompleteMini{border:0;border-radius:12px;background:#e4f5e9!important;color:#267844!important;padding:9px 11px!important;font-size:11px!important;font-weight:900!important;display:flex;align-items:center;gap:5px;box-shadow:none!important}
+.product.saleOff{position:relative;filter:none!important;opacity:1!important;background:#fffaf0;border-color:#e9c46a}.product.saleOff img{opacity:.38;filter:grayscale(.25)}.product.saleOff .pBody{opacity:.58}.product.saleOff::after{content:"ปิดชั่วคราว";position:absolute;right:10px;top:10px;z-index:4;background:#e5a72e;color:#241a0d;padding:7px 10px 7px 28px;border-radius:999px;font-size:11px;font-weight:900;box-shadow:0 5px 14px #9b6b1730}.product.saleOff::before{content:"!";position:absolute;right:82px;top:15px;z-index:5;width:15px;height:15px;border:2px solid #241a0d;border-radius:50%;display:grid;place-items:center;color:#241a0d;font-size:10px;font-weight:950;line-height:1}
+html[lang="en"] .product.saleOff::after{content:"Temporarily unavailable";padding-left:28px}.product.saleOff:disabled{cursor:not-allowed}
+
+/* v5.76 — balanced preorder completion, temporary-sale badge, smooth rapid touch */
+.heldPaidRow{display:grid!important;grid-template-columns:minmax(0,1fr) 108px!important;align-items:center!important;gap:9px!important}
+.heldPaidState{min-height:40px!important;padding:9px 11px!important;font-size:11px!important;line-height:1.15!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.heldPaidState svg{flex:0 0 16px!important}
+.heldCompleteMini{width:108px!important;min-width:108px!important;height:40px!important;padding:0 11px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;white-space:nowrap!important;line-height:1!important;font-size:11px!important;border-radius:12px!important}
+.heldCompleteMini svg{width:15px!important;height:15px!important;flex:0 0 15px!important}
+.product.saleOff{position:relative!important;filter:none!important;opacity:1!important;background:#fffaf0!important;border-color:#e7c57d!important;box-shadow:0 6px 18px #a56a1612!important}
+.product.saleOff img{opacity:.42!important;filter:grayscale(.35)!important}
+.product.saleOff .pBody{opacity:.56!important}
+.product.saleOff::before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,transparent 0 65%,#e2a52e 65% 100%);opacity:.10;pointer-events:none;z-index:2}
+.product.saleOff::after{content:"ปิดชั่วคราว";position:absolute;right:10px;top:10px;z-index:4;display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 10px;border-radius:999px;background:#e7a62b;color:#fff;font-size:11px;line-height:1;font-weight:850;letter-spacing:0;box-shadow:0 4px 12px #a76d1d30;white-space:nowrap}
+html[lang="en"] .product.saleOff::after{content:"Temporarily unavailable";font-size:10px;padding:0 9px}
+.kTabs{grid-template-columns:1fr 1fr!important}
+button,.product,.stockCheck,[role="button"]{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:active,.product:active{transition:none!important}
+@media(max-width:720px){.heldPaidRow{grid-template-columns:minmax(0,1fr) 96px!important}.heldCompleteMini{width:96px!important;min-width:96px!important}.product.saleOff::after{right:7px;top:7px;min-height:27px;padding:0 8px;font-size:10px}}
+
+/* v5.77 — sale-off icon, preorder emphasis, kitchen filters */
+.product.saleOff::before{content:"!"!important;position:absolute!important;inset:auto!important;right:calc(10px + 100px)!important;top:15px!important;z-index:5!important;width:15px!important;height:15px!important;border:2px solid #fff!important;border-radius:50%!important;display:grid!important;place-items:center!important;background:transparent!important;color:#fff!important;font-size:10px!important;font-weight:950!important;line-height:1!important;opacity:1!important;pointer-events:none!important}
+.product.saleOff::after{padding-left:30px!important}
+html[lang="en"] .product.saleOff::before{right:calc(10px + 139px)!important}
+.orderIdentity{position:relative;flex-wrap:wrap}.orderPreBadge{order:5!important;margin-left:0!important;margin-right:8px!important;padding:7px 11px!important;background:#fff0d8!important;border:1px solid #e6c79f!important;color:#784727!important;font-size:12px!important;font-weight:900!important;box-shadow:0 3px 10px #70421f10}.orderPreBadge svg{width:16px!important;height:16px!important;stroke-width:2!important}.orderSummaryRight{margin-left:auto}.orderCard.orderDrop>summary:has(.orderPreBadge){align-items:center}.orderCard.orderDrop>summary:has(.orderPreBadge) .orderIdentity{display:grid!important;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"no meta" "badge meta";column-gap:12px!important;row-gap:6px!important}.orderCard.orderDrop>summary:has(.orderPreBadge) .orderNo{grid-area:no}.orderCard.orderDrop>summary:has(.orderPreBadge) .orderPreBadge{grid-area:badge;justify-self:start}.orderCard.orderDrop>summary:has(.orderPreBadge) .orderMetaChips{grid-area:meta;align-self:center}
+.kFilters.four{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}.kFilters.four button{min-width:0!important;padding:8px 3px!important;font-size:11px!important;white-space:nowrap!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:4px!important}.kFilters.four button b{font-size:12px!important}.kFilters.four .all{background:#f2e9df;color:#65442f}.kFilters.four button.on{background:#6b4328!important;color:#fff!important}
+@media(max-width:1100px){.kFilters.four{grid-template-columns:repeat(4,minmax(0,1fr))!important}.kFilters.four button{font-size:10px!important;gap:3px!important}}
+@media(max-width:760px){.kFilters.four{grid-template-columns:repeat(2,minmax(0,1fr))!important}.orderCard.orderDrop>summary:has(.orderPreBadge) .orderIdentity{display:flex!important}.product.saleOff::before{right:calc(7px + 90px)!important;top:12px!important}}
+
+/* v5.78 — temporary-unavailable icon before label + global language switch */
+.product.saleOff::before{
+  content:"!"!important;right:auto!important;left:auto!important;
+  top:15px!important;width:15px!important;height:15px!important;
+  /* icon sits inside the left side of the pill */
+  transform:translateX(-2px)!important;
+}
+.product.saleOff::after{padding-left:31px!important;}
+/* calculate icon from right so it is immediately before text, not detached */
+.product.saleOff::before{right:calc(10px + 82px)!important;}
+html[lang="en"] .product.saleOff::before{right:calc(10px + 139px)!important;}
+.globalLangSwitch{position:fixed;right:16px;bottom:12px;z-index:140;display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:4px;background:rgba(255,250,244,.96);border:1px solid #dfcdbc;border-radius:14px;box-shadow:0 8px 24px rgba(91,58,41,.16);backdrop-filter:blur(14px);min-width:104px}
+.globalLangSwitch button{height:36px;min-width:44px;border:0;border-radius:10px;background:transparent;color:#75523a;font-size:12px;font-weight:900;cursor:pointer;touch-action:manipulation}
+.globalLangSwitch button.active{background:#5b3823;color:#fff;box-shadow:0 3px 9px rgba(59,37,22,.22)}
+/* reserve room so the fixed language control does not cover Settings nav */
+.app nav{padding-right:132px!important}
+@media(max-width:760px){.globalLangSwitch{right:8px;bottom:8px;min-width:88px;padding:3px}.globalLangSwitch button{height:32px;min-width:38px;font-size:11px}.app nav{padding-right:104px!important}.product.saleOff::before{right:calc(7px + 76px)!important;top:12px!important}html[lang="en"] .product.saleOff::before{right:calc(7px + 124px)!important}}
+
+/* v5.79 — keep temporary-unavailable warning icon inside the yellow pill */
+.product.saleOff::before{display:none!important;content:none!important}
+.product.saleOff::after{
+  content:"!  ปิดชั่วคราว"!important;
+  padding:0 11px!important;
+  gap:6px!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+}
+html[lang="en"] .product.saleOff::after{
+  content:"!  Temporarily unavailable"!important;
+  padding:0 10px!important;
+}
+@media(max-width:720px){
+  .product.saleOff::after{padding:0 9px!important;font-size:10px!important}
+  html[lang="en"] .product.saleOff::after{padding:0 8px!important;font-size:9px!important}
+}
+\n/* v5.80 — payment label + order-derived kitchen statuses + black All labels */
+.categoryStrip button[data-cat="all"]:not(.active){color:#111!important}
+.kFilters .all:not(.on){color:#111!important}
+.kStatus.done{color:#21814a!important}
+.kStatus.cancelled{color:#c7333f!important}
