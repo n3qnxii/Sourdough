@@ -1,26 +1,1715 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#f5eee4"><title>Sourdough POS</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script></head><body>
-<svg class="defs"><symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></symbol><symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol><symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></symbol><symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></symbol><symbol id="cart" viewBox="0 0 24 24"><path d="M3 4h2l2 11h10l3-8H6"/><circle cx="9" cy="20" r="1"/><circle cx="17" cy="20" r="1"/></symbol><symbol id="receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol><symbol id="chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol><symbol id="box" viewBox="0 0 24 24"><path d="M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10"/></symbol><symbol id="store" viewBox="0 0 24 24"><path d="M4 10v11h16V10M3 10l2-7h14l2 7c-1 2-4 2-5 0-1 2-4 2-5 0-1 2-4 2-5 0-1 2-3 2-3 0z"/></symbol><symbol id="gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12l2-1-2-4-2 1-2-2V3h-6v3L7 8 5 7l-2 4 2 1v2l-2 1 2 4 2-1 2 2v2h6v-2l2-2 2 1 2-4-2-1z"/></symbol><symbol id="cash" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.4"/><path d="M5.5 9.2c1.2 0 2-.8 2-2M18.5 9.2c-1.2 0-2-.8-2-2M5.5 14.8c1.2 0 2 .8 2 2M18.5 14.8c-1.2 0-2 .8-2 2"/><circle cx="12" cy="12" r="3.1"/><path d="M12 9.9v4.2M10.8 11h1.8a.9.9 0 0 1 0 1.8h-1.4"/></symbol><symbol id="qr" viewBox="0 0 24 24"><path d="M3 8V4a1 1 0 0 1 1-1h4M16 3h4a1 1 0 0 1 1 1v4M21 16v4a1 1 0 0 1-1 1h-4M8 21H4a1 1 0 0 1-1-1v-4"/><path d="M7 7h4v4H7zM14 7h3v3h-3zM7 14h3v3H7zM13 13h2v2h-2zM17 13h1v4h-3M12 17h2v2h-2"/></symbol><symbol id="print" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7z"/></symbol><symbol id="pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol><symbol id="chef" viewBox="0 0 24 24"><path d="M6 10a4 4 0 0 1 2-7 4 4 0 0 1 8 0 4 4 0 0 1 2 7v3H6zM7 17h10M8 13v8h8v-8"/></symbol><symbol id="calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></symbol><symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/></symbol><symbol id="wallet" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H18a2 2 0 0 1 2 2v2h-5a3 3 0 0 0 0 6h5v2a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 16.5z"/><path d="M15 9h6v6h-6a3 3 0 0 1 0-6z"/><circle cx="16.5" cy="12" r=".7"/></symbol><symbol id="ordersIcon" viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol><symbol id="cancelDoc" viewBox="0 0 24 24"><path d="M6 3h9l3 3v7"/><path d="M15 3v4h4M8 10h7M8 14h4"/><circle cx="17" cy="18" r="4"/><path d="m15.5 16.5 3 3m0-3-3 3"/></symbol><symbol id="moneyTrend" viewBox="0 0 24 24"><path d="M3 18V6M3 18h18"/><path d="m6 15 4-4 3 2 6-7"/><path d="M16 6h3v3"/><circle cx="10" cy="6" r="2.5"/><path d="M10 4.7v2.6M9 5.3h1.5a.7.7 0 0 1 0 1.4H9"/></symbol><symbol id="coins" viewBox="0 0 24 24"><ellipse cx="9" cy="7" rx="5" ry="2.5"/><path d="M4 7v4c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V7M4 11v4c0 1.4 2.2 2.5 5 2.5 1.1 0 2.1-.2 3-.5"/><ellipse cx="17" cy="15" rx="4" ry="2"/><path d="M13 15v3c0 1.1 1.8 2 4 2s4-.9 4-2v-3"/></symbol><symbol id="percentDoc" viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6zM15 3v4h3"/><circle cx="10" cy="10" r="1.5"/><circle cx="14" cy="15" r="1.5"/><path d="m15 9-6 7"/></symbol><symbol id="cashPay" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="20" height="13" rx="2.6"/><path d="M8 10V7.8h20v13H25M11 7.8V5.5h18v12.8h-1"/><circle cx="15" cy="16.5" r="4"/><path d="M15 13.8v5.4M13.4 15.1h2.4c1.8 0 1.8 2.7 0 2.7h-2.1M7.8 13.2c1.4 0 2.3-.9 2.3-2.2M22.2 19.8c-1.4 0-2.3.9-2.3 2.2"/><path d="M27.5 4.2v3.2M25.9 5.8h3.2"/></g></symbol></svg>
-<div id="login" class="login"><div class="loginCard"><img src="login-logo-transparent.png" class="loginLogo" alt="Sourdough"><div class="loginMotto"><b>GOOD BREAD</b><span>BRIGHTER DAYS</span></div><label class="inputIcon"><svg><use href="#user"/></svg><select id="loginUser" aria-label="Account"></select></label><div class="inputIcon passwordField"><svg aria-hidden="true"><use href="#lock"/></svg><input id="loginPass" name="password" type="password" inputmode="none" pattern="[0-9]*" autocomplete="off" readonly placeholder="PIN" aria-label="PIN" autocapitalize="none" spellcheck="false"><button type="button" id="togglePass" class="fieldIcon" aria-label="Show password"><svg><use href="#eye"/></svg></button></div><div id="loginPinPad" class="pinModal hidden" aria-label="PIN keypad" aria-hidden="true"><div class="pinModalBackdrop" data-pin-close="1"></div><section class="pinModalCard" role="dialog" aria-modal="true" aria-labelledby="pinModalTitle"><button type="button" class="pinModalClose" data-pin-close="1" aria-label="Close">×</button><div class="pinModalIcon"><svg><use href="#lock"/></svg></div><div class="pinModalHead"><h2 id="pinModalTitle">Enter PIN</h2><p>Use the keypad to sign in</p></div><div id="pinDots" class="pinDots" aria-live="polite"></div><div class="loginPinPad"><button type="button" data-pin="1">1</button><button type="button" data-pin="2">2</button><button type="button" data-pin="3">3</button><button type="button" data-pin="4">4</button><button type="button" data-pin="5">5</button><button type="button" data-pin="6">6</button><button type="button" data-pin="7">7</button><button type="button" data-pin="8">8</button><button type="button" data-pin="9">9</button><button type="button" class="pinUtility" data-pin="clear">Clear</button><button type="button" data-pin="0">0</button><button type="button" class="pinUtility" data-pin="back" aria-label="Delete"><span class="pinBackIcon">⌫</span></button></div><button type="button" id="pinDone" class="pinDone"><span>Login</span><svg><use href="#arrow"/></svg></button></section></div><button id="loginBtn" type="button" class="primary loginButton"><span>Login</span><svg><use href="#arrow"/></svg></button><div class="posCredit"><i></i><span>POS by n3qnxii</span></div><div id="loginError" class="error"></div></div></div>
-<div id="app" class="app hidden"><header><div class="brand"><img id="headerShopLogo" src="shop-logo-transparent.png"><div><b>Sourdough</b><span>GOOD BREAD · BRIGHTER DAYS</span></div></div><div class="headRight"><span id="clock"></span><b id="who"></b><button id="logout" class="ghost">ออกจากระบบ</button></div></header>
-<aside id="heldDrawer" class="heldDrawer"><div class="heldDrawerHead"><div><small>รายการพักออเดอร์</small><h3>ออเดอร์ที่พักไว้</h3></div><button id="heldDrawerClose" class="heldDrawerClose" type="button">×</button></div><div class="heldBox"><div id="heldOrders"></div></div></aside><div id="heldDrawerBackdrop" class="heldDrawerBackdrop hidden"></div><main>
-<section id="sell" class="page active"><div class="catalog"><div class="pageTitle"><div><span class="live"><i></i> กำลังขาย</span><h2>หน้าขาย</h2><p id="salePulse">ยังไม่ได้เลือกสินค้า</p></div><input id="search" placeholder="ค้นหาเมนู"></div><div class="categoryStripWrap"><div id="categoryNav" class="categoryStrip"></div></div><div id="products" class="products"></div></div><div class="cartPanel"><div class="cartHead"><div><small>ออเดอร์ปัจจุบัน</small><h2 id="orderNo">#001</h2></div><button id="clear" class="iconDanger"><svg><use href="#trash"/></svg>ล้าง</button></div><div id="cartItems" class="cartItems"></div><div class="cartBottom"><div class="sum"><span>จำนวน</span><b id="itemCount">0 ชิ้น</b></div><div id="saleTaxSummary" class="saleTaxSummary hidden"></div><div class="sum total"><span>รวม</span><b id="total">฿0</b></div><button id="payBtn" class="primary big"><span class="payMainIcon" aria-hidden="true"><svg><use href="#cashPay"/></svg></span><span class="payMainText">ชำระเงิน</span></button><div class="two"><button id="holdBtn" class="warm"><svg><use href="#pause"/></svg>พักออเดอร์</button><button id="cancelBtn" class="danger">ยกเลิกออเดอร์</button></div></div></div></section>
-<section id="orders" class="page"><div class="pagebox"><div class="tabs orderTopTabs">
-<button class="active" data-otab="history"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h4"/></svg><span>ออเดอร์</span></button>
-<button data-otab="kitchen"><svg viewBox="0 0 24 24"><path d="M8 8a4 4 0 0 1 8 0v1h1a3 3 0 0 1 1 5.83V20H6v-5.17A3 3 0 0 1 7 9h1V8zM9 20v-5M15 20v-5"/></svg><span>ครัว</span></button>
-<button data-otab="preorder"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h3M8 17h6"/></svg><span>สั่งจองล่วงหน้า</span></button>
-</div><div id="orderTab"></div></div></section>
-<section id="reports" class="page reportPage"><div class="pagebox"><div class="pageHead"><div><h2>สรุปปิดยอดวันนี้</h2><p>ยอดขาย เงินสด QR และจำนวนออเดอร์</p></div><button id="printSummary" class="primary"><svg><use href="#print"/></svg>พิมพ์สรุปยอดวันนี้</button></div><div id="todayStats" class="stats"></div></div><div class="pagebox"><div class="pageHead"><div><h2>เช็กยอดออเดอร์ย้อนหลัง</h2><p>เลือกวันที่เพื่อดูรายละเอียด</p></div><input id="reportDate" type="date"></div><div id="pastStats" class="stats"></div><h3>ยอดขายสินค้า</h3><div id="productSales" class="table"></div></div></section>
-<section id="stock" class="page"><div class="pagebox"><div class="pageHead"><div><h2>สต๊อกสินค้า</h2><p>จัดตามหมวดหมู่เพื่อปรับจำนวนได้ง่าย</p></div><div class="actions"><button id="selectAllStock" type="button">เลือกทั้งหมด</button><label class="stockCategoryJump"><span class="srOnly">หมวดหมู่</span><select id="stockCategoryJump" aria-label="เลือกหมวดหมู่"><option value="all">ทุกหมวดหมู่</option></select></label><button id="bulkMinus">− 1</button><button id="bulkPlus" class="warm">+ 1</button></div></div><div id="stockList"></div></div></section>
-<section id="manage" class="page"><div class="pagebox"><div class="pageHead"><div><h2>จัดการร้าน</h2><p>สินค้า รูป ราคา หมวดหมู่ และข้อมูลเตรียมอาหาร</p></div><div class="actions"><button id="addCategory" class="warm">+ หมวดหมู่</button><button id="addProduct" class="primary">+ เพิ่มเมนู</button></div></div><div id="categoryManager" class="chips"></div><div id="menuManager" class="manageList"></div></div></section>
-<section id="settings" class="page"><div class="pagebox"><div class="settingsTitleRow"><h2>ตั้งค่า</h2><div class="langSwitch" role="group" aria-label="Language"><button id="langTH" type="button">TH</button><button id="langEN" type="button">EN</button></div></div><div id="settingsHome" class="settingsMenu"><button data-settings="store"><span class="settingsIcon"><svg><use href="#store"/></svg></span><b>ตั้งค่าร้าน</b><span>ชำระเงิน</span></button><button data-settings="printer"><span class="settingsIcon"><svg><use href="#print"/></svg></span><b>ตั้งค่าเครื่องพิมพ์</b><span>AIMO D520 และขนาดกระดาษ</span></button><button data-settings="staff"><span class="settingsIcon"><svg><use href="#user"/></svg></span><b>จัดการพนักงาน</b><span>ชื่อ Username และ Password</span></button><button data-settings="tax"><span class="settingsIcon taxIcon">%</span><b>ภาษี</b><span>VAT และรูปแบบการคิดภาษี</span></button><button data-settings="backup"><span class="settingsIcon"><svg><use href="#ordersIcon"/></svg></span><b>สำรองข้อมูล</b><span>Export ยอดขาย CSV / Excel</span></button></div><div class="settingsGrid settingsPanels"><div class="settingsCard settingsPanel" data-panel="store"><button class="settingsBack">← กลับ</button><h3>ชำระเงิน</h3><label>ชื่อร้าน<input id="shopName" placeholder="Sourdough"></label><div class="shopLogoSetting"><div><b>โลโก้ร้าน</b><small>ใช้บนแถบด้านบนและใบเสร็จ · แนะนำ PNG พื้นหลังโปร่งใส</small></div><div id="shopLogoPreview" class="shopLogoPreview"></div><div class="shopLogoActions"><label class="shopLogoUpload">เลือกรูปโลโก้<input id="shopLogoInput" type="file" accept="image/png,image/jpeg,image/webp"></label><button id="resetShopLogo" type="button" class="ghost">ใช้โลโก้เดิม</button></div></div><div class="promptpayField"><label>เบอร์ QR ไดนามิก / PromptPay<input id="promptpay" inputmode="numeric" placeholder="0812345678 หรือเลขบัตร 13 หลัก"></label><button id="removePromptpay" type="button" class="promptDelete"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg><span>ลบเบอร์ QR</span></button></div><div class="qrUploadCard"><div><b>รูป QR ของร้าน</b><small>ใส่รูป QR ที่มีอยู่แล้วได้ หรือปล่อยว่างเพื่อใช้ QR ที่ระบบสร้างจาก PromptPay</small></div><label class="qrUploadBtn">เลือกรูป QR<input id="qrImageInput" type="file" accept="image/*"></label><div id="qrImagePreview" class="qrImagePreview"></div><button id="removeQrImage" type="button" class="softDanger hidden">ลบรูป QR</button></div><p>หากใส่รูป QR ระบบจะแสดงรูปนี้ตอนรับชำระเงิน ส่วนยอดชำระจะแสดงอยู่ใต้ QR อย่างชัดเจน</p><button id="savePrompt" class="primary">บันทึกการตั้งค่าร้าน</button><div id="settingsQR" class="settingsQR"></div></div><div class="settingsCard settingsPanel" data-panel="printer"><button class="settingsBack">← กลับ</button><h3>เครื่องพิมพ์</h3><p><b>AIMO D520</b> · 203 DPI · USB/Bluetooth</p><label>ความกว้างงานพิมพ์<select id="printerWidth"><option value="80">80 mm</option><option value="100">100 mm</option><option value="108">108 mm</option></select></label><p class="printerNote">บนคอมพิวเตอร์ให้ติดตั้ง D520 เป็น system printer แล้วปุ่มพิมพ์จะเปิดหน้าต่างพิมพ์ขนาดที่เลือก ส่วน iPad รุ่นนี้เชื่อม Bluetooth ผ่าน Labelife จึงไม่สามารถสั่ง Bluetooth ตรงจาก Safari ได้</p><button id="testPrinter" class="warm"><svg><use href="#print"/></svg>ทดสอบพิมพ์ D520</button></div><div class="settingsCard settingsPanel" data-panel="staff"><button class="settingsBack">← กลับ</button><h3>จัดการพนักงาน</h3><div id="accountSettings"></div></div><div class="settingsCard settingsPanel taxSettingsPanel" data-panel="tax"><button class="settingsBack">← กลับ</button><div class="taxPanelHead"><span class="taxHeroIcon">%</span><div><h3>ภาษีและค่าบริการ</h3><p>ตั้งค่าการคำนวณภาษีสำหรับการขายและใบเสร็จ</p></div></div><div class="taxLayout"><div class="taxForm"><label class="taxToggleCard"><span><b>เปิดใช้ภาษีมูลค่าเพิ่ม (VAT)</b><small>คำนวณภาษีในหน้าชำระเงินและแสดงในใบเสร็จ</small></span><input id="taxEnabled" type="checkbox"><i></i></label><div class="taxTwo"><label>อัตราภาษี (%)<div class="taxInputSuffix"><input id="taxRate" type="number" min="0" max="100" step="0.01" value="7"><span>%</span></div></label><label>วิธีคิดราคา<select id="taxMode"><option value="inclusive">ราคารวมภาษีแล้ว (Tax Inclusive)</option><option value="exclusive">ราคาไม่รวมภาษี (Tax Exclusive)</option></select></label></div><div class="taxTwo"><label>ชื่อภาษีที่แสดงบนใบเสร็จ<input id="taxLabel" value="VAT" maxlength="20"></label><label>การปัดเศษภาษี<select id="taxRounding"><option value="2">ปัดเศษ 2 ตำแหน่ง (มาตรฐาน)</option><option value="0">ปัดเป็นจำนวนเต็ม</option></select></label></div><label class="taxToggleCard serviceToggle"><span><b>ค่าบริการ (ไม่บังคับ)</b><small>เปิดเมื่อต้องการเพิ่ม Service charge แยกจาก VAT</small></span><input id="serviceEnabled" type="checkbox"><i></i></label><div id="serviceFields" class="taxTwo"><label>ค่าบริการ (%)<div class="taxInputSuffix"><input id="serviceRate" type="number" min="0" max="100" step="0.01" value="0"><span>%</span></div></label><label>ชื่อที่แสดง<input id="serviceLabel" value="Service charge" maxlength="30"></label></div><div class="taxInfo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg><span>การเปลี่ยนแปลงจะมีผลกับการขายครั้งถัดไป และไม่แก้ยอดออเดอร์เก่า</span></div><button id="saveTaxSettings" class="primary taxSave"><svg viewBox="0 0 24 24"><path d="M5 4h12l2 2v14H5zM8 4v6h8V4M8 16h8"/></svg>บันทึกการตั้งค่าภาษี</button></div><aside class="taxPreview"><div class="taxPreviewTitle"><span class="receiptIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></span><div><b>ตัวอย่างการคำนวณ</b><small>อัปเดตตามการตั้งค่าทันที</small></div></div><div class="taxExample"><b id="taxExampleMode">ราคารวมภาษีแล้ว (Tax Inclusive)</b><div><span>ยอดสินค้า</span><strong>฿1,000.00</strong></div><div id="serviceExampleRow"><span>Service charge</span><strong id="serviceExample">฿0.00</strong></div><div><span id="taxExampleLabel">VAT 7%</span><strong id="taxExampleValue">฿65.42</strong></div><hr><div class="taxGrand"><span>ยอดรวม</span><strong id="taxExampleTotal">฿1,000.00</strong></div></div><div class="taxReceiptMini"><div class="miniReceiptTop"><span class="miniBread">◒</span><b id="taxPreviewShop">Sourdough</b></div><div class="miniDash"></div><div><span>Classic Sourdough × 1</span><b>฿1,000.00</b></div><div id="miniServiceRow"><span>Service charge</span><b id="miniServiceValue">฿0.00</b></div><div><span id="miniTaxLabel">VAT 7%</span><b id="miniTaxValue">฿65.42</b></div><div class="miniDash"></div><div class="miniTotal"><span>ยอดรวม</span><b id="miniTaxTotal">฿1,000.00</b></div></div></aside></div></div><div class="settingsCard settingsPanel" data-panel="backup"><button class="settingsBack">← กลับ</button><h3>สำรองข้อมูลยอดขาย</h3><label>เลือกวันที่<input id="exportDate" type="date"></label><p>ส่งออกออเดอร์ รายการสินค้า วิธีชำระเงิน ยอดขาย ต้นทุน และกำไรของวันที่เลือก</p><div class="two"><button id="exportCSV" class="warm">Export CSV</button><button id="exportExcel" class="primary">Export Excel</button></div></div></div></div></section>
-</main><div class="globalLangSwitch" role="group" aria-label="Language"><button id="globalLangTH" type="button">TH</button><button id="globalLangEN" type="button">EN</button></div><nav><button id="heldNavBtn" class="heldNavBtn" type="button"><span class="heldNavIcon"><svg><use href="#pause"/></svg><b id="heldFloatBadge" class="heldNotify hidden">0</b></span><span>พักออเดอร์</span></button><button data-page="sell" class="active"><svg><use href="#cash"/></svg><span>ขาย</span></button><button data-page="orders"><svg><use href="#ordersIcon"/></svg><span>ออเดอร์</span></button><button data-page="stock"><svg><use href="#box"/></svg><span>สต๊อก</span></button><button data-page="manage"><svg><use href="#store"/></svg><span>จัดการร้าน</span></button><button data-page="reports"><svg><use href="#moneyTrend"/></svg><span>รายงาน</span></button><button data-page="settings"><svg><use href="#gear"/></svg><span>ตั้งค่า</span></button></nav></div>
-<div id="variantModal" class="modal hidden" data-outside-close="true"><div class="modalBox"><button class="close" data-close="variantModal">×</button><h2 id="variantTitle">เมนู</h2><div id="variantChoices" class="variantChoices"></div></div></div>
-<div id="payModal" class="modal hidden"><div class="modalBox payBox"><button class="close" data-close="payModal">×</button><span class="eyebrow">ยอดชำระ</span><div id="payTotal" class="payTotal">฿0</div><div id="payTaxSummary" class="payTaxSummary hidden"></div><div class="method"><button data-method="cash" class="active"><svg><use href="#cash"/></svg>เงินสด</button><button data-method="qr"><svg><use href="#qr"/></svg>PromptPay QR</button></div><div id="cashArea"><label class="cashInputWrap">รับเงิน<input id="cashInput" inputmode="none" readonly placeholder="0"><span>แตะช่องเพื่อเปิดแป้นตัวเลข</span></label><div class="cashDisplay"><span>รับเงิน</span><b id="receivedDisplay">฿0</b></div><div id="quickCash" class="quickCash"></div><div id="changeBox" class="change"><span id="changeLabel">เงินทอน</span><b id="change">฿0</b></div></div><div id="qrArea" class="hidden"><button id="qrZoom" class="qrWrap"><div id="qrcode"></div><b id="qrAmount"></b><small>แตะ QR เพื่อขยายเต็มจอ</small></button><div id="qrStatus"></div></div><button id="confirmPay" class="primary big">ยืนยันการชำระเงิน</button></div></div>
-<div id="cashPadModal" class="modal cashPadModal hidden"><div class="cashPadBox"><button id="cashPadClose" class="cashPadClose" aria-label="Close">×</button><div class="cashPadHead"><span>ลูกค้าจ่าย</span><strong id="cashPadValue">฿0</strong></div><div id="cashPadKeys" class="cashPadKeys"></div><button id="cashPadExact" class="cashPadExact">พอดี</button><button id="cashPadUse" class="cashPadUse">ใช้จำนวนนี้</button></div></div>
-<div id="successModal" class="modal hidden"><div class="modalBox successBox"><div class="successCheck">✓</div><h1>ชำระเงินสำเร็จ</h1><p id="successOrder">Order #001</p><div id="successAmount" class="successAmount">฿0</div><div class="successGrid"><div><span>ลูกค้าจ่าย</span><b id="successPaid">฿0</b></div><div><span>เงินทอน</span><b id="successChange">฿0</b></div></div><div class="successCountdown"><div class="clockIcon" aria-hidden="true"><span></span></div><div><b>กลับหน้าขายใน <span id="successSeconds">5</span> วินาที</b><small>แตะ “เริ่มออเดอร์ใหม่” เพื่อกลับทันที</small></div><div class="countRing"><svg viewBox="0 0 44 44"><circle class="ringBg" cx="22" cy="22" r="18"></circle><circle id="countRingProgress" class="ringProgress" cx="22" cy="22" r="18"></circle></svg><strong id="ringSeconds">5</strong></div></div><div class="successActions"><button id="successPrint" class="warm">พิมพ์ใบเสร็จ</button><button id="successNew" class="primary">เริ่มออเดอร์ใหม่</button></div></div></div>
-<div id="qrFull" class="modal hidden"><div class="qrFullBox"><button class="close" data-close="qrFull">×</button><div id="qrcodeFull"></div><h2 id="qrFullAmount"></h2><p>Sourdough · PromptPay</p></div></div>
-<div id="imageCropModal" class="modal hidden"><div class="modalBox cropBox"><button class="close" id="cropClose" type="button">×</button><h2>ปรับรูปสินค้า</h2><p class="cropHint">ลากรูปในกรอบเพื่อจัดตำแหน่ง · ใช้สองนิ้วหรือสกอลล์เพื่อซูม</p><div class="cropStage"><canvas id="cropCanvas" width="640" height="640"></canvas></div><div id="cropShapeChooser" class="cropShapeChooser hidden"><b id="cropShapeTitle">เลือกรูปทรงกรอบ</b><div class="cropShapeGrid"><button type="button" data-shape="square"><i class="shapePreview square"></i><span>สี่เหลี่ยม</span></button><button type="button" data-shape="rounded"><i class="shapePreview rounded"></i><span>เหลี่ยมมน</span></button><button type="button" data-shape="circle"><i class="shapePreview circle"></i><span>วงกลม</span></button><button type="button" data-shape="oval"><i class="shapePreview oval"></i><span>วงรี</span></button><button type="button" data-shape="heart"><i class="shapePreview heart">♥</i><span>หัวใจ</span></button><button type="button" data-shape="arch"><i class="shapePreview arch"></i><span>ซุ้มโค้ง</span></button></div></div><div class="cropControls directCropTools"><button id="cropZoomOut" type="button">−</button><span id="cropZoomLabel">ซูมรูป</span><button id="cropZoomIn" type="button">+</button></div><div class="cropActions"><button id="cropCancel" type="button" class="warm">ยกเลิก</button><button id="cropApply" type="button" class="primary">ใช้รูปนี้</button></div></div></div>
-<div id="categoryModal" class="modal hidden"><div class="modalBox categoryModalBox"><button class="close" data-close="categoryModal">×</button><span class="eyebrow">จัดการหมวดหมู่</span><h2>เพิ่มหมวดหมู่ใหม่</h2><p class="modalLead">ตั้งชื่อหมวดหมู่สำหรับจัดเมนูในหน้าขาย</p><label class="categoryNameField">ชื่อหมวดหมู่<input id="newCategoryName" maxlength="30" placeholder="เช่น เครื่องดื่ม, เมนูพิเศษ"></label><div class="categoryModalActions"><button id="cancelCategory" type="button">ยกเลิก</button><button id="confirmCategory" type="button" class="primary"><svg><use href="#plus"/></svg>เพิ่มหมวดหมู่</button></div></div></div>
-<div id="editorModal" class="modal hidden"><div class="modalBox"><button class="close" data-close="editorModal">×</button><h2 id="editorTitle">เพิ่มเมนู</h2><form id="productForm" class="formGrid"><input id="editId" type="hidden"><div class="wide editorPhotoTop"><label>รูปสินค้า<input id="editImage" type="file" accept="image/*"><small class="imageHelp">เลือกรูปแล้วลากจัดตำแหน่งและซูมในกรอบได้ทันที</small></label><div id="imagePreview" class="editablePreview"></div></div><label>ชื่อสินค้า<input id="editName" required></label><label>หมวดหมู่<select id="editCategory"></select></label><label>ราคาเต็ม/ปกติ<input id="editPrice" type="number" required></label><label class="wide halfToggle"><input id="hasHalf" type="checkbox"> สินค้านี้มีตัวเลือกครึ่งโลฟ</label><div id="halfFields" class="wide halfFields"><label>ราคาครึ่งโลฟ<input id="editHalf" type="number"></label><label>ต้นทุนครึ่งโลฟ<input id="editHalfCost" type="number"></label><label>ชื่อครึ่งโลฟ<input id="editHalfName" placeholder="ครึ่งโลฟ"></label><label>รูปครึ่งโลฟ<input id="editHalfImage" type="file" accept="image/*"><small class="imageHelp">เลือกรูปแล้วสามารถครอป เลื่อน และซูมได้</small></label><div id="halfImagePreview" class="editablePreview"></div></div><label>ต้นทุน<input id="editCost" type="number"></label><label>สต๊อก<input id="editStock" type="number"></label><label class="wide">ข้อมูลเตรียม/วัตถุดิบ<textarea id="editPrep" placeholder="เช่น หั่นครึ่ง, แพ็กถุง, งาดำ... (แก้ไขได้)"></textarea></label><button class="primary wide">บันทึกเมนู</button></form></div></div>
-<div id="preorderModal" class="modal hidden"><div class="modalBox"><button class="close" data-close="preorderModal">×</button><h2>สร้างออเดอร์ล่วงหน้า</h2><form id="preorderForm" class="formGrid"><label>ชื่อลูกค้า<input id="preName" required></label><label>เบอร์โทร<input id="prePhone" inputmode="tel"></label><label>วันที่รับ<input id="preDate" type="date" required></label><label>เวลา<input id="preTime" type="time" required></label><label class="wide">หมายเหตุ<textarea id="preNote"></textarea></label><div class="wide"><h3>เลือกเมนู</h3><div id="preProducts" class="preProducts"></div></div><button class="primary wide">บันทึกออเดอร์ล่วงหน้า</button></form></div></div>
-<div id="deleteProductModal" class="modal hidden deleteProductModal" onclick="if(event.target===this)closeDeleteProductModal()"><div class="modalCard deleteProductCard"><button class="x" type="button" onclick="closeDeleteProductModal()">×</button><div class="deleteProductIcon"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/></svg></div><h2 id="deleteProductTitle">ลบสินค้านี้ใช่ไหม?</h2><div class="deleteProductTarget"><img id="deleteProductImage" src="logo.png" alt=""><b id="deleteProductName"></b></div><p id="deleteProductText"></p><div class="deleteProductActions"><button id="deleteProductCancel" type="button" onclick="closeDeleteProductModal()">เก็บสินค้าไว้</button><button class="danger" type="button" onclick="confirmDeleteProduct()"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/></svg><span id="deleteProductConfirmText">ลบสินค้า</span></button></div></div></div><div id="printArea" aria-hidden="true"></div><script src="app.js"></script><div id="staffEditorModal" class="modal hidden staffEditorModal" onclick="if(event.target===this)closeStaffEditor()"><div class="modalCard staffEditorCard"><button class="x staffEditorClose" type="button" onclick="closeStaffEditor()">×</button><div class="staffEditorTitle"><h2 id="staffEditorTitle">แก้ไขพนักงาน</h2><p>ปรับข้อมูลพนักงานและสิทธิ์การใช้งาน</p></div><div class="staffProfileTop"><label class="staffPhotoEditor"><img id="staffEditAvatar" src="assets/staff/avatar-owner.svg" alt="Staff photo"><span class="staffPhotoEdit"><svg viewBox="0 0 24 24"><path d="M4 20h4l11-11-4-4L4 16v4Z"/><path d="m13 7 4 4"/></svg></span><input id="staffEditAvatarInput" type="file" accept="image/*"><input id="staffEditAvatarData" type="hidden"></label><div class="staffRoleBlock"><b>บทบาท</b><span id="staffEditRole" class="staffRoleBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7-4.2-2.2L7.8 16l.8-4.7L5.2 8l4.7-.7L12 3Z"/></svg></span></div></div><input id="staffEditIndex" type="hidden"><div class="staffEditFields"><label><span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20c.8-4 3.2-6 7-6s6.2 2 7 6"/></svg>ชื่อที่แสดง</span><input id="staffEditName" autocomplete="off"></label><label><span class="atIcon">@</span><span>Username</span><input id="staffEditUser" autocomplete="off"></label><label><span><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Password</span><input id="staffEditPass" autocomplete="new-password"></label></div><label class="staffActiveEdit"><span><b>อนุญาตให้เข้าสู่ระบบ</b><small>เปิด/ปิดสิทธิ์การใช้งานบัญชีนี้</small></span><input id="staffEditActive" type="checkbox"><i></i></label><div id="staffCurrentNotice" class="staffCurrentNotice"><i></i><span>บัญชีที่กำลังเข้าสู่ระบบจะแสดงจุดสีเขียวในหน้ารายชื่อ</span></div><div class="staffEditorActions"><button id="staffEditDelete" class="softDanger" type="button" onclick="deleteStaffEditor()"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/></svg>ลบพนักงาน</button><button class="staffCancelBtn" type="button" onclick="closeStaffEditor()">ยกเลิก</button><button id="staffEditSave" class="primary" type="button" onclick="saveStaffEditor()">บันทึกข้อมูล</button></div></div></div></body></html>
+<!DOCTYPE html>
+<html lang="th">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
+  <meta content="#f5eee4" name="theme-color"/>
+  <title>
+   Sourdough POS
+  </title>
+  <link href="manifest.webmanifest" rel="manifest"/>
+  <link href="style.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js">
+  </script>
+ </head>
+ <body>
+  <svg class="defs">
+   <symbol id="user" viewbox="0 0 24 24">
+    <circle cx="12" cy="8" r="4">
+    </circle>
+    <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7">
+    </path>
+   </symbol>
+   <symbol id="lock" viewbox="0 0 24 24">
+    <rect height="11" rx="2" width="14" x="5" y="10">
+    </rect>
+    <path d="M8 10V7a4 4 0 0 1 8 0v3">
+    </path>
+   </symbol>
+   <symbol id="eye" viewbox="0 0 24 24">
+    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z">
+    </path>
+    <circle cx="12" cy="12" r="2.5">
+    </circle>
+   </symbol>
+   <symbol id="arrow" viewbox="0 0 24 24">
+    <path d="M5 12h14M14 7l5 5-5 5">
+    </path>
+   </symbol>
+   <symbol id="cart" viewbox="0 0 24 24">
+    <path d="M3 4h2l2 11h10l3-8H6">
+    </path>
+    <circle cx="9" cy="20" r="1">
+    </circle>
+    <circle cx="17" cy="20" r="1">
+    </circle>
+   </symbol>
+   <symbol id="receipt" viewbox="0 0 24 24">
+    <path d="M6 3h12v18l-3-2-3 2-3-2-3 2z">
+    </path>
+    <path d="M9 8h6M9 12h6">
+    </path>
+   </symbol>
+   <symbol id="chart" viewbox="0 0 24 24">
+    <path d="M4 20V10M10 20V4M16 20v-7M22 20H2">
+    </path>
+   </symbol>
+   <symbol id="box" viewbox="0 0 24 24">
+    <path d="M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10">
+    </path>
+   </symbol>
+   <symbol id="store" viewbox="0 0 24 24">
+    <path d="M4 10v11h16V10M3 10l2-7h14l2 7c-1 2-4 2-5 0-1 2-4 2-5 0-1 2-4 2-5 0-1 2-3 2-3 0z">
+    </path>
+   </symbol>
+   <symbol id="gear" viewbox="0 0 24 24">
+    <circle cx="12" cy="12" r="3">
+    </circle>
+    <path d="M19 12l2-1-2-4-2 1-2-2V3h-6v3L7 8 5 7l-2 4 2 1v2l-2 1 2 4 2-1 2 2v2h6v-2l2-2 2 1 2-4-2-1z">
+    </path>
+   </symbol>
+   <symbol id="cash" viewbox="0 0 24 24">
+    <rect height="12" rx="2.4" width="19" x="2.5" y="6">
+    </rect>
+    <path d="M5.5 9.2c1.2 0 2-.8 2-2M18.5 9.2c-1.2 0-2-.8-2-2M5.5 14.8c1.2 0 2 .8 2 2M18.5 14.8c-1.2 0-2 .8-2 2">
+    </path>
+    <circle cx="12" cy="12" r="3.1">
+    </circle>
+    <path d="M12 9.9v4.2M10.8 11h1.8a.9.9 0 0 1 0 1.8h-1.4">
+    </path>
+   </symbol>
+   <symbol id="qr" viewbox="0 0 24 24">
+    <path d="M3 8V4a1 1 0 0 1 1-1h4M16 3h4a1 1 0 0 1 1 1v4M21 16v4a1 1 0 0 1-1 1h-4M8 21H4a1 1 0 0 1-1-1v-4">
+    </path>
+    <path d="M7 7h4v4H7zM14 7h3v3h-3zM7 14h3v3H7zM13 13h2v2h-2zM17 13h1v4h-3M12 17h2v2h-2">
+    </path>
+   </symbol>
+   <symbol id="print" viewbox="0 0 24 24">
+    <path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7z">
+    </path>
+   </symbol>
+   <symbol id="pause" viewbox="0 0 24 24">
+    <path d="M8 5v14M16 5v14">
+    </path>
+   </symbol>
+   <symbol id="chef" viewbox="0 0 24 24">
+    <path d="M6 10a4 4 0 0 1 2-7 4 4 0 0 1 8 0 4 4 0 0 1 2 7v3H6zM7 17h10M8 13v8h8v-8">
+    </path>
+   </symbol>
+   <symbol id="calendar" viewbox="0 0 24 24">
+    <rect height="16" rx="2" width="18" x="3" y="5">
+    </rect>
+    <path d="M7 3v4M17 3v4M3 10h18">
+    </path>
+   </symbol>
+   <symbol id="plus" viewbox="0 0 24 24">
+    <path d="M12 5v14M5 12h14">
+    </path>
+   </symbol>
+   <symbol id="trash" viewbox="0 0 24 24">
+    <path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14">
+    </path>
+   </symbol>
+   <symbol id="wallet" viewbox="0 0 24 24">
+    <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H18a2 2 0 0 1 2 2v2h-5a3 3 0 0 0 0 6h5v2a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 16.5z">
+    </path>
+    <path d="M15 9h6v6h-6a3 3 0 0 1 0-6z">
+    </path>
+    <circle cx="16.5" cy="12" r=".7">
+    </circle>
+   </symbol>
+   <symbol id="ordersIcon" viewbox="0 0 24 24">
+    <path d="M6 3h12v18H6z">
+    </path>
+    <path d="M9 8h6M9 12h6M9 16h4">
+    </path>
+    <circle cx="17.5" cy="17.5" r="2.5">
+    </circle>
+   </symbol>
+   <symbol id="cancelDoc" viewbox="0 0 24 24">
+    <path d="M6 3h9l3 3v7">
+    </path>
+    <path d="M15 3v4h4M8 10h7M8 14h4">
+    </path>
+    <circle cx="17" cy="18" r="4">
+    </circle>
+    <path d="m15.5 16.5 3 3m0-3-3 3">
+    </path>
+   </symbol>
+   <symbol id="moneyTrend" viewbox="0 0 24 24">
+    <path d="M3 18V6M3 18h18">
+    </path>
+    <path d="m6 15 4-4 3 2 6-7">
+    </path>
+    <path d="M16 6h3v3">
+    </path>
+    <circle cx="10" cy="6" r="2.5">
+    </circle>
+    <path d="M10 4.7v2.6M9 5.3h1.5a.7.7 0 0 1 0 1.4H9">
+    </path>
+   </symbol>
+   <symbol id="coins" viewbox="0 0 24 24">
+    <ellipse cx="9" cy="7" rx="5" ry="2.5">
+    </ellipse>
+    <path d="M4 7v4c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V7M4 11v4c0 1.4 2.2 2.5 5 2.5 1.1 0 2.1-.2 3-.5">
+    </path>
+    <ellipse cx="17" cy="15" rx="4" ry="2">
+    </ellipse>
+    <path d="M13 15v3c0 1.1 1.8 2 4 2s4-.9 4-2v-3">
+    </path>
+   </symbol>
+   <symbol id="percentDoc" viewbox="0 0 24 24">
+    <path d="M6 3h9l3 3v15H6zM15 3v4h3">
+    </path>
+    <circle cx="10" cy="10" r="1.5">
+    </circle>
+    <circle cx="14" cy="15" r="1.5">
+    </circle>
+    <path d="m15 9-6 7">
+    </path>
+   </symbol>
+   <symbol id="cashPay" viewbox="0 0 32 32">
+    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
+     <rect height="13" rx="2.6" width="20" x="5" y="10">
+     </rect>
+     <path d="M8 10V7.8h20v13H25M11 7.8V5.5h18v12.8h-1">
+     </path>
+     <circle cx="15" cy="16.5" r="4">
+     </circle>
+     <path d="M15 13.8v5.4M13.4 15.1h2.4c1.8 0 1.8 2.7 0 2.7h-2.1M7.8 13.2c1.4 0 2.3-.9 2.3-2.2M22.2 19.8c-1.4 0-2.3.9-2.3 2.2">
+     </path>
+     <path d="M27.5 4.2v3.2M25.9 5.8h3.2">
+     </path>
+    </g>
+   </symbol>
+  </svg>
+  <div class="login" id="login">
+   <div class="loginCard">
+    <img alt="Sourdough" class="loginLogo" src="login-logo-transparent.png"/>
+    <div class="loginMotto">
+     <b>
+      GOOD BREAD
+     </b>
+     <span>
+      BRIGHTER DAYS
+     </span>
+    </div>
+    <label class="inputIcon">
+     <svg>
+      <use href="#user">
+      </use>
+     </svg>
+     <select aria-label="Account" id="loginUser">
+     </select>
+    </label>
+    <div class="inputIcon passwordField">
+     <svg aria-hidden="true">
+      <use href="#lock">
+      </use>
+     </svg>
+     <input aria-label="PIN" autocapitalize="none" autocomplete="off" id="loginPass" inputmode="none" name="password" pattern="[0-9]*" placeholder="PIN" readonly="" spellcheck="false" type="password"/>
+     <button aria-label="Show password" class="fieldIcon" id="togglePass" type="button">
+      <svg>
+       <use href="#eye">
+       </use>
+      </svg>
+     </button>
+    </div>
+    <div aria-hidden="true" aria-label="PIN keypad" class="pinModal hidden" id="loginPinPad">
+     <div class="pinModalBackdrop" data-pin-close="1">
+     </div>
+     <section aria-labelledby="pinModalTitle" aria-modal="true" class="pinModalCard" role="dialog">
+      <button aria-label="Close" class="pinModalClose" data-pin-close="1" type="button">
+       ×
+      </button>
+      <div class="pinModalIcon">
+       <svg>
+        <use href="#lock">
+        </use>
+       </svg>
+      </div>
+      <div class="pinModalHead">
+       <h2 id="pinModalTitle">
+        Enter PIN
+       </h2>
+       <p>
+        Use the keypad to sign in
+       </p>
+      </div>
+      <div aria-live="polite" class="pinDots" id="pinDots">
+      </div>
+      <div class="loginPinPad">
+       <button data-pin="1" type="button">
+        1
+       </button>
+       <button data-pin="2" type="button">
+        2
+       </button>
+       <button data-pin="3" type="button">
+        3
+       </button>
+       <button data-pin="4" type="button">
+        4
+       </button>
+       <button data-pin="5" type="button">
+        5
+       </button>
+       <button data-pin="6" type="button">
+        6
+       </button>
+       <button data-pin="7" type="button">
+        7
+       </button>
+       <button data-pin="8" type="button">
+        8
+       </button>
+       <button data-pin="9" type="button">
+        9
+       </button>
+       <button class="pinUtility" data-pin="clear" type="button">
+        Clear
+       </button>
+       <button data-pin="0" type="button">
+        0
+       </button>
+       <button aria-label="Delete" class="pinUtility" data-pin="back" type="button">
+        <span class="pinBackIcon">
+         ⌫
+        </span>
+       </button>
+      </div>
+      <button class="pinDone" id="pinDone" type="button">
+       <span>
+        Login
+       </span>
+       <svg>
+        <use href="#arrow">
+        </use>
+       </svg>
+      </button>
+     </section>
+    </div>
+    <button class="primary loginButton" id="loginBtn" type="button">
+     <span>
+      Login
+     </span>
+     <svg>
+      <use href="#arrow">
+      </use>
+     </svg>
+    </button>
+    <div class="posCredit">
+     <i>
+     </i>
+     <span>
+      POS by n3qnxii
+     </span>
+    </div>
+    <div class="error" id="loginError">
+    </div>
+   </div>
+  </div>
+  <div class="app hidden" id="app">
+   <header>
+    <div class="brand">
+     <img id="headerShopLogo" src="shop-logo-transparent.png"/>
+     <div>
+      <b>
+       Sourdough
+      </b>
+      <span>
+       GOOD BREAD · BRIGHTER DAYS
+      </span>
+     </div>
+    </div>
+    <div class="headRight">
+     <span id="clock">
+     </span>
+     <b id="who">
+     </b>
+     <button class="ghost" id="logout">
+      ออกจากระบบ
+     </button>
+    </div>
+   </header>
+   <aside class="heldDrawer" id="heldDrawer">
+    <div class="heldDrawerHead">
+     <div>
+      <small>
+       รายการพักออเดอร์
+      </small>
+      <h3>
+       ออเดอร์ที่พักไว้
+      </h3>
+     </div>
+     <button class="heldDrawerClose" id="heldDrawerClose" type="button">
+      ×
+     </button>
+    </div>
+    <div class="heldBox">
+     <div id="heldOrders">
+     </div>
+    </div>
+   </aside>
+   <div class="heldDrawerBackdrop hidden" id="heldDrawerBackdrop">
+   </div>
+   <main>
+    <section class="page active" id="sell">
+     <div class="catalog">
+      <div class="pageTitle">
+       <div>
+        <span class="live">
+         <i>
+         </i>
+         กำลังขาย
+        </span>
+        <h2>
+         หน้าขาย
+        </h2>
+        <p id="salePulse">
+         ยังไม่ได้เลือกสินค้า
+        </p>
+       </div>
+       <input id="search" placeholder="ค้นหาเมนู"/>
+      </div>
+      <div class="categoryStripWrap">
+       <div class="categoryStrip" id="categoryNav">
+       </div>
+      </div>
+      <div class="products" id="products">
+      </div>
+     </div>
+     <div class="cartPanel">
+      <div class="cartHead">
+       <div>
+        <small>
+         ออเดอร์ปัจจุบัน
+        </small>
+        <h2 id="orderNo">
+         #001
+        </h2>
+       </div>
+       <button class="iconDanger" id="clear">
+        <svg>
+         <use href="#trash">
+         </use>
+        </svg>
+        ล้าง
+       </button>
+      </div>
+      <div class="cartItems" id="cartItems">
+      </div>
+      <div class="cartBottom">
+       <div class="sum">
+        <span>
+         จำนวน
+        </span>
+        <b id="itemCount">
+         0 ชิ้น
+        </b>
+       </div>
+       <div class="saleTaxSummary hidden" id="saleTaxSummary">
+       </div>
+       <div class="sum total">
+        <span>
+         รวม
+        </span>
+        <b id="total">
+         ฿0
+        </b>
+       </div>
+       <button class="primary big" id="payBtn">
+        <span aria-hidden="true" class="payMainIcon">
+         <svg>
+          <use href="#cashPay">
+          </use>
+         </svg>
+        </span>
+        <span class="payMainText">
+         ชำระเงิน
+        </span>
+       </button>
+       <div class="two">
+        <button class="warm" id="holdBtn">
+         <svg>
+          <use href="#pause">
+          </use>
+         </svg>
+         พักออเดอร์
+        </button>
+        <button class="danger" id="cancelBtn">
+         ยกเลิกออเดอร์
+        </button>
+       </div>
+      </div>
+     </div>
+    </section>
+    <section class="page" id="orders">
+     <div class="pagebox">
+      <div class="tabs orderTopTabs">
+       <button class="active" data-otab="history">
+        <svg viewbox="0 0 24 24">
+         <path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h4">
+         </path>
+        </svg>
+        <span>
+         ออเดอร์
+        </span>
+       </button>
+       <button data-otab="kitchen">
+        <svg viewbox="0 0 24 24">
+         <path d="M8 8a4 4 0 0 1 8 0v1h1a3 3 0 0 1 1 5.83V20H6v-5.17A3 3 0 0 1 7 9h1V8zM9 20v-5M15 20v-5">
+         </path>
+        </svg>
+        <span>
+         ครัว
+        </span>
+       </button>
+       <button data-otab="preorder">
+        <svg viewbox="0 0 24 24">
+         <rect height="16" rx="2" width="18" x="3" y="5">
+         </rect>
+         <path d="M7 3v4M17 3v4M3 10h18M8 14h3M8 17h6">
+         </path>
+        </svg>
+        <span>
+         สั่งจองล่วงหน้า
+        </span>
+       </button>
+      </div>
+      <div id="orderTab">
+      </div>
+     </div>
+    </section>
+    <section class="page reportPage" id="reports">
+     <div class="pagebox">
+      <div class="pageHead">
+       <div>
+        <h2>
+         สรุปปิดยอดวันนี้
+        </h2>
+        <p>
+         ยอดขาย เงินสด QR และจำนวนออเดอร์
+        </p>
+       </div>
+       <button class="primary" id="printSummary">
+        <svg>
+         <use href="#print">
+         </use>
+        </svg>
+        พิมพ์สรุปยอดวันนี้
+       </button>
+      </div>
+      <div class="stats" id="todayStats">
+      </div>
+     </div>
+     <div class="pagebox">
+      <div class="pageHead">
+       <div>
+        <h2>
+         เช็กยอดออเดอร์ย้อนหลัง
+        </h2>
+        <p>
+         เลือกวันที่เพื่อดูรายละเอียด
+        </p>
+       </div>
+       <input id="reportDate" type="date"/>
+      </div>
+      <div class="stats" id="pastStats">
+      </div>
+      <h3>
+       ยอดขายสินค้า
+      </h3>
+      <div class="table" id="productSales">
+      </div>
+     </div>
+    </section>
+    <section class="page" id="stock">
+     <div class="pagebox">
+      <div class="pageHead">
+       <div>
+        <h2>
+         สต๊อกสินค้า
+        </h2>
+        <p>
+         จัดตามหมวดหมู่เพื่อปรับจำนวนได้ง่าย
+        </p>
+       </div>
+       <div class="actions">
+        <button id="selectAllStock" type="button">
+         เลือกทั้งหมด
+        </button>
+        <label class="stockCategoryJump">
+         <span class="srOnly">
+          หมวดหมู่
+         </span>
+         <select aria-label="เลือกหมวดหมู่" id="stockCategoryJump">
+          <option value="all">
+           ทุกหมวดหมู่
+          </option>
+         </select>
+        </label>
+        <button id="bulkMinus">
+         − 1
+        </button>
+        <button class="warm" id="bulkPlus">
+         + 1
+        </button>
+       </div>
+      </div>
+      <div id="stockList">
+      </div>
+     </div>
+    </section>
+    <section class="page" id="manage">
+     <div class="pagebox">
+      <div class="pageHead">
+       <div>
+        <h2>
+         จัดการร้าน
+        </h2>
+        <p>
+         สินค้า รูป ราคา หมวดหมู่ และข้อมูลเตรียมอาหาร
+        </p>
+       </div>
+       <div class="actions">
+        <button class="warm" id="addCategory">
+         + หมวดหมู่
+        </button>
+        <button class="primary" id="addProduct">
+         + เพิ่มเมนู
+        </button>
+       </div>
+      </div>
+      <div class="chips" id="categoryManager">
+      </div>
+      <div class="manageList" id="menuManager">
+      </div>
+     </div>
+    </section>
+    <section class="page" id="settings">
+     <div class="pagebox">
+      <div class="settingsTitleRow">
+       <h2>
+        ตั้งค่า
+       </h2>
+       <div aria-label="Language" class="langSwitch" role="group">
+        <button id="langTH" type="button">
+         TH
+        </button>
+        <button id="langEN" type="button">
+         EN
+        </button>
+       </div>
+      </div>
+      <div class="settingsMenu" id="settingsHome">
+       <button data-settings="store">
+        <span class="settingsIcon">
+         <svg>
+          <use href="#store">
+          </use>
+         </svg>
+        </span>
+        <b>
+         ตั้งค่าร้าน
+        </b>
+        <span>
+         ชำระเงิน
+        </span>
+       </button>
+       <button data-settings="printer">
+        <span class="settingsIcon">
+         <svg>
+          <use href="#print">
+          </use>
+         </svg>
+        </span>
+        <b>
+         ตั้งค่าเครื่องพิมพ์
+        </b>
+        <span>
+         AIMO D520 และขนาดกระดาษ
+        </span>
+       </button>
+       <button data-settings="staff">
+        <span class="settingsIcon">
+         <svg>
+          <use href="#user">
+          </use>
+         </svg>
+        </span>
+        <b>
+         จัดการพนักงาน
+        </b>
+        <span>
+         ชื่อ Username และ Password
+        </span>
+       </button>
+       <button data-settings="tax">
+        <span class="settingsIcon taxIcon">
+         %
+        </span>
+        <b>
+         ภาษี
+        </b>
+        <span>
+         VAT และรูปแบบการคิดภาษี
+        </span>
+       </button>
+       <button data-settings="backup">
+        <span class="settingsIcon">
+         <svg>
+          <use href="#ordersIcon">
+          </use>
+         </svg>
+        </span>
+        <b>
+         สำรองข้อมูล
+        </b>
+        <span>
+         Export ยอดขาย CSV / Excel
+        </span>
+       </button>
+      </div>
+      <div class="settingsGrid settingsPanels">
+       <div class="settingsCard settingsPanel" data-panel="store">
+        <button class="settingsBack">
+         ← กลับ
+        </button>
+        <h3>
+         ชำระเงิน
+        </h3>
+        <label>
+         ชื่อร้าน
+         <input id="shopName" placeholder="Sourdough"/>
+        </label>
+        <div class="shopLogoSetting">
+         <div>
+          <b>
+           โลโก้ร้าน
+          </b>
+          <small>
+           ใช้บนแถบด้านบนและใบเสร็จ · แนะนำ PNG พื้นหลังโปร่งใส
+          </small>
+         </div>
+         <div class="shopLogoPreview" id="shopLogoPreview">
+         </div>
+         <div class="shopLogoActions">
+          <label class="shopLogoUpload">
+           เลือกรูปโลโก้
+           <input accept="image/png,image/jpeg,image/webp" id="shopLogoInput" type="file"/>
+          </label>
+          <button class="ghost" id="resetShopLogo" type="button">
+           ใช้โลโก้เดิม
+          </button>
+         </div>
+        </div>
+        <div class="promptpayField">
+         <label>
+          เบอร์ QR ไดนามิก / PromptPay
+          <input id="promptpay" inputmode="numeric" placeholder="0812345678 หรือเลขบัตร 13 หลัก"/>
+         </label>
+         <button class="promptDelete" id="removePromptpay" type="button">
+          <svg viewbox="0 0 24 24">
+           <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5">
+           </path>
+          </svg>
+          <span>
+           ลบเบอร์ QR
+          </span>
+         </button>
+        </div>
+        <div class="qrUploadCard">
+         <div>
+          <b>
+           รูป QR ของร้าน
+          </b>
+          <small>
+           ใส่รูป QR ที่มีอยู่แล้วได้ หรือปล่อยว่างเพื่อใช้ QR ที่ระบบสร้างจาก PromptPay
+          </small>
+         </div>
+         <label class="qrUploadBtn">
+          เลือกรูป QR
+          <input accept="image/*" id="qrImageInput" type="file"/>
+         </label>
+         <div class="qrImagePreview" id="qrImagePreview">
+         </div>
+         <button class="softDanger hidden" id="removeQrImage" type="button">
+          ลบรูป QR
+         </button>
+        </div>
+        <p>
+         หากใส่รูป QR ระบบจะแสดงรูปนี้ตอนรับชำระเงิน ส่วนยอดชำระจะแสดงอยู่ใต้ QR อย่างชัดเจน
+        </p>
+        <button class="primary" id="savePrompt">
+         บันทึกการตั้งค่าร้าน
+        </button>
+        <div class="settingsQR" id="settingsQR">
+        </div>
+       </div>
+       <div class="settingsCard settingsPanel" data-panel="printer">
+        <button class="settingsBack">
+         ← กลับ
+        </button>
+        <h3>
+         เครื่องพิมพ์
+        </h3>
+        <p>
+         <b>
+          AIMO D520
+         </b>
+         · 203 DPI · USB/Bluetooth
+        </p>
+        <label>
+         ความกว้างงานพิมพ์
+         <select id="printerWidth">
+          <option value="80">
+           80 mm
+          </option>
+          <option value="100">
+           100 mm
+          </option>
+          <option value="108">
+           108 mm
+          </option>
+         </select>
+        </label>
+        <p class="printerNote">
+         บนคอมพิวเตอร์ให้ติดตั้ง D520 เป็น system printer แล้วปุ่มพิมพ์จะเปิดหน้าต่างพิมพ์ขนาดที่เลือก ส่วน iPad รุ่นนี้เชื่อม Bluetooth ผ่าน Labelife จึงไม่สามารถสั่ง Bluetooth ตรงจาก Safari ได้
+        </p>
+        <button class="warm" id="testPrinter">
+         <svg>
+          <use href="#print">
+          </use>
+         </svg>
+         ทดสอบพิมพ์ D520
+        </button>
+       </div>
+       <div class="settingsCard settingsPanel" data-panel="staff">
+        <button class="settingsBack">
+         ← กลับ
+        </button>
+        <h3>
+         จัดการพนักงาน
+        </h3>
+        <div id="accountSettings">
+        </div>
+       </div>
+       <div class="settingsCard settingsPanel taxSettingsPanel" data-panel="tax">
+        <button class="settingsBack">
+         ← กลับ
+        </button>
+        <div class="taxPanelHead">
+         <span class="taxHeroIcon">
+          %
+         </span>
+         <div>
+          <h3>
+           ภาษีและค่าบริการ
+          </h3>
+          <p>
+           ตั้งค่าการคำนวณภาษีสำหรับการขายและใบเสร็จ
+          </p>
+         </div>
+        </div>
+        <div class="taxLayout">
+         <div class="taxForm">
+          <label class="taxToggleCard">
+           <span>
+            <b>
+             เปิดใช้ภาษีมูลค่าเพิ่ม (VAT)
+            </b>
+            <small>
+             คำนวณภาษีในหน้าชำระเงินและแสดงในใบเสร็จ
+            </small>
+           </span>
+           <input id="taxEnabled" type="checkbox"/>
+           <i>
+           </i>
+          </label>
+          <div class="taxTwo">
+           <label>
+            อัตราภาษี (%)
+            <div class="taxInputSuffix">
+             <input id="taxRate" max="100" min="0" step="0.01" type="number" value="7"/>
+             <span>
+              %
+             </span>
+            </div>
+           </label>
+           <label>
+            วิธีคิดราคา
+            <select id="taxMode">
+             <option value="inclusive">
+              ราคารวมภาษีแล้ว (Tax Inclusive)
+             </option>
+             <option value="exclusive">
+              ราคาไม่รวมภาษี (Tax Exclusive)
+             </option>
+            </select>
+           </label>
+          </div>
+          <div class="taxTwo">
+           <label>
+            ชื่อภาษีที่แสดงบนใบเสร็จ
+            <input id="taxLabel" maxlength="20" value="VAT"/>
+           </label>
+           <label>
+            การปัดเศษภาษี
+            <select id="taxRounding">
+             <option value="2">
+              ปัดเศษ 2 ตำแหน่ง (มาตรฐาน)
+             </option>
+             <option value="0">
+              ปัดเป็นจำนวนเต็ม
+             </option>
+            </select>
+           </label>
+          </div>
+          <label class="taxToggleCard serviceToggle">
+           <span>
+            <b>
+             ค่าบริการ (ไม่บังคับ)
+            </b>
+            <small>
+             เปิดเมื่อต้องการเพิ่ม Service charge แยกจาก VAT
+            </small>
+           </span>
+           <input id="serviceEnabled" type="checkbox"/>
+           <i>
+           </i>
+          </label>
+          <div class="taxTwo" id="serviceFields">
+           <label>
+            ค่าบริการ (%)
+            <div class="taxInputSuffix">
+             <input id="serviceRate" max="100" min="0" step="0.01" type="number" value="0"/>
+             <span>
+              %
+             </span>
+            </div>
+           </label>
+           <label>
+            ชื่อที่แสดง
+            <input id="serviceLabel" maxlength="30" value="Service charge"/>
+           </label>
+          </div>
+          <div class="taxInfo">
+           <svg viewbox="0 0 24 24">
+            <circle cx="12" cy="12" r="9">
+            </circle>
+            <path d="M12 11v6M12 7h.01">
+            </path>
+           </svg>
+           <span>
+            การเปลี่ยนแปลงจะมีผลกับการขายครั้งถัดไป และไม่แก้ยอดออเดอร์เก่า
+           </span>
+          </div>
+          <button class="primary taxSave" id="saveTaxSettings">
+           <svg viewbox="0 0 24 24">
+            <path d="M5 4h12l2 2v14H5zM8 4v6h8V4M8 16h8">
+            </path>
+           </svg>
+           บันทึกการตั้งค่าภาษี
+          </button>
+         </div>
+         <aside class="taxPreview">
+          <div class="taxPreviewTitle">
+           <span class="receiptIcon">
+            <svg viewbox="0 0 24 24">
+             <path d="M6 3h12v18l-3-2-3 2-3-2-3 2z">
+             </path>
+             <path d="M9 8h6M9 12h6">
+             </path>
+            </svg>
+           </span>
+           <div>
+            <b>
+             ตัวอย่างการคำนวณ
+            </b>
+            <small>
+             อัปเดตตามการตั้งค่าทันที
+            </small>
+           </div>
+          </div>
+          <div class="taxExample">
+           <b id="taxExampleMode">
+            ราคารวมภาษีแล้ว (Tax Inclusive)
+           </b>
+           <div>
+            <span>
+             ยอดสินค้า
+            </span>
+            <strong>
+             ฿1,000.00
+            </strong>
+           </div>
+           <div id="serviceExampleRow">
+            <span>
+             Service charge
+            </span>
+            <strong id="serviceExample">
+             ฿0.00
+            </strong>
+           </div>
+           <div>
+            <span id="taxExampleLabel">
+             VAT 7%
+            </span>
+            <strong id="taxExampleValue">
+             ฿65.42
+            </strong>
+           </div>
+           <hr/>
+           <div class="taxGrand">
+            <span>
+             ยอดรวม
+            </span>
+            <strong id="taxExampleTotal">
+             ฿1,000.00
+            </strong>
+           </div>
+          </div>
+          <div class="taxReceiptMini">
+           <div class="miniReceiptTop">
+            <span class="miniBread">
+             ◒
+            </span>
+            <b id="taxPreviewShop">
+             Sourdough
+            </b>
+           </div>
+           <div class="miniDash">
+           </div>
+           <div>
+            <span>
+             Classic Sourdough × 1
+            </span>
+            <b>
+             ฿1,000.00
+            </b>
+           </div>
+           <div id="miniServiceRow">
+            <span>
+             Service charge
+            </span>
+            <b id="miniServiceValue">
+             ฿0.00
+            </b>
+           </div>
+           <div>
+            <span id="miniTaxLabel">
+             VAT 7%
+            </span>
+            <b id="miniTaxValue">
+             ฿65.42
+            </b>
+           </div>
+           <div class="miniDash">
+           </div>
+           <div class="miniTotal">
+            <span>
+             ยอดรวม
+            </span>
+            <b id="miniTaxTotal">
+             ฿1,000.00
+            </b>
+           </div>
+          </div>
+         </aside>
+        </div>
+       </div>
+       <div class="settingsCard settingsPanel" data-panel="backup">
+        <button class="settingsBack">
+         ← กลับ
+        </button>
+        <h3>
+         สำรองข้อมูลยอดขาย
+        </h3>
+        <label>
+         เลือกวันที่
+         <input id="exportDate" type="date"/>
+        </label>
+        <p>
+         ส่งออกออเดอร์ รายการสินค้า วิธีชำระเงิน ยอดขาย ต้นทุน และกำไรของวันที่เลือก
+        </p>
+        <div class="two">
+         <button class="warm" id="exportCSV">
+          Export CSV
+         </button>
+         <button class="primary" id="exportExcel">
+          Export Excel
+         </button>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section>
+   </main>
+   <div aria-label="Language" class="globalLangSwitch" role="group">
+    <button id="globalLangTH" type="button">
+     TH
+    </button>
+    <button id="globalLangEN" type="button">
+     EN
+    </button>
+   </div>
+   <nav>
+    <button class="heldNavBtn" id="heldNavBtn" type="button">
+     <span class="heldNavIcon">
+      <svg>
+       <use href="#pause">
+       </use>
+      </svg>
+      <b class="heldNotify hidden" id="heldFloatBadge">
+       0
+      </b>
+     </span>
+     <span>
+      พักออเดอร์
+     </span>
+    </button>
+    <button class="active" data-page="sell">
+     <svg>
+      <use href="#cash">
+      </use>
+     </svg>
+     <span>
+      ขาย
+     </span>
+    </button>
+    <button data-page="orders">
+     <svg>
+      <use href="#ordersIcon">
+      </use>
+     </svg>
+     <span>
+      ออเดอร์
+     </span>
+    </button>
+    <button data-page="stock">
+     <svg>
+      <use href="#box">
+      </use>
+     </svg>
+     <span>
+      สต๊อก
+     </span>
+    </button>
+    <button data-page="manage">
+     <svg>
+      <use href="#store">
+      </use>
+     </svg>
+     <span>
+      จัดการร้าน
+     </span>
+    </button>
+    <button data-page="reports">
+     <svg>
+      <use href="#moneyTrend">
+      </use>
+     </svg>
+     <span>
+      รายงาน
+     </span>
+    </button>
+    <button data-page="settings">
+     <svg>
+      <use href="#gear">
+      </use>
+     </svg>
+     <span>
+      ตั้งค่า
+     </span>
+    </button>
+   </nav>
+  </div>
+  <div class="modal hidden" data-outside-close="true" id="variantModal">
+   <div class="modalBox">
+    <button class="close" data-close="variantModal">
+     ×
+    </button>
+    <h2 id="variantTitle">
+     เมนู
+    </h2>
+    <div class="variantChoices" id="variantChoices">
+    </div>
+   </div>
+  </div>
+  <div class="modal hidden" id="payModal">
+   <div class="modalBox payBox">
+    <button class="close" data-close="payModal">
+     ×
+    </button>
+    <span class="eyebrow">
+     ยอดชำระ
+    </span>
+    <div class="payTotal" id="payTotal">
+     ฿0
+    </div>
+    <div class="payTaxSummary hidden" id="payTaxSummary">
+    </div>
+    <div class="method">
+     <button class="active" data-method="cash">
+      <svg>
+       <use href="#cash">
+       </use>
+      </svg>
+      เงินสด
+     </button>
+     <button data-method="qr">
+      <svg>
+       <use href="#qr">
+       </use>
+      </svg>
+      PromptPay QR
+     </button>
+    </div>
+    <div id="cashArea">
+     <label class="cashInputWrap">
+      รับเงิน
+      <input id="cashInput" inputmode="none" placeholder="0" readonly=""/>
+      <span>
+       แตะช่องเพื่อเปิดแป้นตัวเลข
+      </span>
+     </label>
+     <div class="cashDisplay">
+      <span>
+       รับเงิน
+      </span>
+      <b id="receivedDisplay">
+       ฿0
+      </b>
+     </div>
+     <div class="quickCash" id="quickCash">
+     </div>
+     <div class="change" id="changeBox">
+      <span id="changeLabel">
+       เงินทอน
+      </span>
+      <b id="change">
+       ฿0
+      </b>
+     </div>
+    </div>
+    <div class="hidden" id="qrArea">
+     <button class="qrWrap" id="qrZoom">
+      <div id="qrcode">
+      </div>
+      <b id="qrAmount">
+      </b>
+      <small>
+       แตะ QR เพื่อขยายเต็มจอ
+      </small>
+     </button>
+     <div id="qrStatus">
+     </div>
+    </div>
+    <button class="primary big" id="confirmPay">
+     ยืนยันการชำระเงิน
+    </button>
+   </div>
+  </div>
+  <div class="modal cashPadModal hidden" id="cashPadModal">
+   <div class="cashPadBox">
+    <button aria-label="Close" class="cashPadClose" id="cashPadClose">
+     ×
+    </button>
+    <div class="cashPadHead">
+     <span>
+      ลูกค้าจ่าย
+     </span>
+     <strong id="cashPadValue">
+      ฿0
+     </strong>
+    </div>
+    <div class="cashPadKeys" id="cashPadKeys">
+    </div>
+    <button class="cashPadExact" id="cashPadExact">
+     พอดี
+    </button>
+    <button class="cashPadUse" id="cashPadUse">
+     ใช้จำนวนนี้
+    </button>
+   </div>
+  </div>
+  <div class="modal hidden" id="successModal">
+   <div class="modalBox successBox">
+    <div class="successCheck">
+     ✓
+    </div>
+    <h1>
+     ชำระเงินสำเร็จ
+    </h1>
+    <p id="successOrder">
+     Order #001
+    </p>
+    <div class="successAmount" id="successAmount">
+     ฿0
+    </div>
+    <div class="successGrid">
+     <div>
+      <span>
+       ลูกค้าจ่าย
+      </span>
+      <b id="successPaid">
+       ฿0
+      </b>
+     </div>
+     <div>
+      <span>
+       เงินทอน
+      </span>
+      <b id="successChange">
+       ฿0
+      </b>
+     </div>
+    </div>
+    <div class="successCountdown">
+     <div aria-hidden="true" class="clockIcon">
+      <span>
+      </span>
+     </div>
+     <div>
+      <b>
+       กลับหน้าขายใน
+       <span id="successSeconds">
+        5
+       </span>
+       วินาที
+      </b>
+      <small>
+       แตะ “เริ่มออเดอร์ใหม่” เพื่อกลับทันที
+      </small>
+     </div>
+     <div class="countRing">
+      <svg viewbox="0 0 44 44">
+       <circle class="ringBg" cx="22" cy="22" r="18">
+       </circle>
+       <circle class="ringProgress" cx="22" cy="22" id="countRingProgress" r="18">
+       </circle>
+      </svg>
+      <strong id="ringSeconds">
+       5
+      </strong>
+     </div>
+    </div>
+    <div class="successActions">
+     <button class="warm" id="successPrint">
+      พิมพ์ใบเสร็จ
+     </button>
+     <button class="primary" id="successNew">
+      เริ่มออเดอร์ใหม่
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal hidden" id="qrFull">
+   <div class="qrFullBox">
+    <button class="close" data-close="qrFull">
+     ×
+    </button>
+    <div id="qrcodeFull">
+    </div>
+    <h2 id="qrFullAmount">
+    </h2>
+    <p>
+     Sourdough · PromptPay
+    </p>
+   </div>
+  </div>
+  <div class="modal hidden" id="imageCropModal">
+   <div class="modalBox cropBox">
+    <button class="close" id="cropClose" type="button">
+     ×
+    </button>
+    <h2>
+     ปรับรูปสินค้า
+    </h2>
+    <p class="cropHint">
+     ลากรูปในกรอบเพื่อจัดตำแหน่ง · ใช้สองนิ้วหรือสกอลล์เพื่อซูม
+    </p>
+    <div class="cropStage">
+     <canvas height="640" id="cropCanvas" width="640">
+     </canvas>
+    </div>
+    <div class="cropShapeChooser hidden" id="cropShapeChooser">
+     <b id="cropShapeTitle">
+      เลือกรูปทรงกรอบ
+     </b>
+     <div class="cropShapeGrid">
+      <button data-shape="square" type="button">
+       <i class="shapePreview square">
+       </i>
+       <span>
+        สี่เหลี่ยม
+       </span>
+      </button>
+      <button data-shape="rounded" type="button">
+       <i class="shapePreview rounded">
+       </i>
+       <span>
+        เหลี่ยมมน
+       </span>
+      </button>
+      <button data-shape="circle" type="button">
+       <i class="shapePreview circle">
+       </i>
+       <span>
+        วงกลม
+       </span>
+      </button>
+      <button data-shape="oval" type="button">
+       <i class="shapePreview oval">
+       </i>
+       <span>
+        วงรี
+       </span>
+      </button>
+      <button data-shape="heart" type="button">
+       <i class="shapePreview heart">
+        ♥
+       </i>
+       <span>
+        หัวใจ
+       </span>
+      </button>
+      <button data-shape="arch" type="button">
+       <i class="shapePreview arch">
+       </i>
+       <span>
+        ซุ้มโค้ง
+       </span>
+      </button>
+     </div>
+    </div>
+    <div class="cropControls directCropTools">
+     <button id="cropZoomOut" type="button">
+      −
+     </button>
+     <span id="cropZoomLabel">
+      ซูมรูป
+     </span>
+     <button id="cropZoomIn" type="button">
+      +
+     </button>
+    </div>
+    <div class="cropActions">
+     <button class="warm" id="cropCancel" type="button">
+      ยกเลิก
+     </button>
+     <button class="primary" id="cropApply" type="button">
+      ใช้รูปนี้
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal hidden" id="categoryModal">
+   <div class="modalBox categoryModalBox">
+    <button class="close" data-close="categoryModal">
+     ×
+    </button>
+    <span class="eyebrow">
+     จัดการหมวดหมู่
+    </span>
+    <h2>
+     เพิ่มหมวดหมู่ใหม่
+    </h2>
+    <p class="modalLead">
+     ตั้งชื่อหมวดหมู่สำหรับจัดเมนูในหน้าขาย
+    </p>
+    <label class="categoryNameField">
+     ชื่อหมวดหมู่
+     <input id="newCategoryName" maxlength="30" placeholder="เช่น เครื่องดื่ม, เมนูพิเศษ"/>
+    </label>
+    <div class="categoryModalActions">
+     <button id="cancelCategory" type="button">
+      ยกเลิก
+     </button>
+     <button class="primary" id="confirmCategory" type="button">
+      <svg>
+       <use href="#plus">
+       </use>
+      </svg>
+      เพิ่มหมวดหมู่
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal hidden" id="editorModal">
+   <div class="modalBox">
+    <button class="close" data-close="editorModal">
+     ×
+    </button>
+    <h2 id="editorTitle">
+     เพิ่มเมนู
+    </h2>
+    <form class="formGrid" id="productForm">
+     <input id="editId" type="hidden"/>
+     <div class="wide editorPhotoTop">
+      <label>
+       รูปสินค้า
+       <input accept="image/*" id="editImage" type="file"/>
+       <small class="imageHelp">
+        เลือกรูปแล้วลากจัดตำแหน่งและซูมในกรอบได้ทันที
+       </small>
+      </label>
+      <div class="editablePreview" id="imagePreview">
+      </div>
+     </div>
+     <label>
+      ชื่อสินค้า
+      <input id="editName" required=""/>
+     </label>
+     <label>
+      หมวดหมู่
+      <select id="editCategory">
+      </select>
+     </label>
+     <label>
+      ราคาเต็ม/ปกติ
+      <input id="editPrice" required="" type="number"/>
+     </label>
+     <label class="wide halfToggle">
+      <input id="hasHalf" type="checkbox"/>
+      สินค้านี้มีตัวเลือกครึ่งโลฟ
+     </label>
+     <div class="wide halfFields" id="halfFields">
+      <label>
+       ราคาครึ่งโลฟ
+       <input id="editHalf" type="number"/>
+      </label>
+      <label>
+       ต้นทุนครึ่งโลฟ
+       <input id="editHalfCost" type="number"/>
+      </label>
+      <label>
+       ชื่อครึ่งโลฟ
+       <input id="editHalfName" placeholder="ครึ่งโลฟ"/>
+      </label>
+      <label>
+       รูปครึ่งโลฟ
+       <input accept="image/*" id="editHalfImage" type="file"/>
+       <small class="imageHelp">
+        เลือกรูปแล้วสามารถครอป เลื่อน และซูมได้
+       </small>
+      </label>
+      <div class="editablePreview" id="halfImagePreview">
+      </div>
+     </div>
+     <label>
+      ต้นทุน
+      <input id="editCost" type="number"/>
+     </label>
+     <label>
+      สต๊อก
+      <input id="editStock" type="number"/>
+     </label>
+     <label class="wide">
+      ข้อมูลเตรียม/วัตถุดิบ
+      <textarea id="editPrep" placeholder="เช่น หั่นครึ่ง, แพ็กถุง, งาดำ... (แก้ไขได้)"></textarea>
+     </label>
+     <button class="primary wide">
+      บันทึกเมนู
+     </button>
+    </form>
+   </div>
+  </div>
+  <div class="modal hidden" id="preorderModal">
+   <div class="modalBox">
+    <button class="close" data-close="preorderModal">
+     ×
+    </button>
+    <h2>
+     สร้างออเดอร์ล่วงหน้า
+    </h2>
+    <form class="formGrid" id="preorderForm">
+     <label>
+      ชื่อลูกค้า
+      <input id="preName" required=""/>
+     </label>
+     <label>
+      เบอร์โทร
+      <input id="prePhone" inputmode="tel"/>
+     </label>
+     <label>
+      วันที่รับ
+      <input id="preDate" required="" type="date"/>
+     </label>
+     <label>
+      เวลา
+      <input id="preTime" required="" type="time"/>
+     </label>
+     <label class="wide">
+      หมายเหตุ
+      <textarea id="preNote"></textarea>
+     </label>
+     <div class="wide">
+      <h3>
+       เลือกเมนู
+      </h3>
+      <div class="preProducts" id="preProducts">
+      </div>
+     </div>
+     <button class="primary wide">
+      บันทึกออเดอร์ล่วงหน้า
+     </button>
+    </form>
+   </div>
+  </div>
+  <div class="modal hidden deleteProductModal" id="deleteProductModal" onclick="if(event.target===this)closeDeleteProductModal()">
+   <div class="modalCard deleteProductCard">
+    <button class="x" onclick="closeDeleteProductModal()" type="button">
+     ×
+    </button>
+    <div class="deleteProductIcon">
+     <svg viewbox="0 0 24 24">
+      <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13">
+      </path>
+     </svg>
+    </div>
+    <h2 id="deleteProductTitle">
+     ลบสินค้านี้ใช่ไหม?
+    </h2>
+    <div class="deleteProductTarget">
+     <img alt="" id="deleteProductImage" src="logo.png"/>
+     <b id="deleteProductName">
+     </b>
+    </div>
+    <p id="deleteProductText">
+    </p>
+    <div class="deleteProductActions">
+     <button id="deleteProductCancel" onclick="closeDeleteProductModal()" type="button">
+      เก็บสินค้าไว้
+     </button>
+     <button class="danger" onclick="confirmDeleteProduct()" type="button">
+      <svg viewbox="0 0 24 24">
+       <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13">
+       </path>
+      </svg>
+      <span id="deleteProductConfirmText">
+       ลบสินค้า
+      </span>
+     </button>
+    </div>
+   </div>
+  </div>
+  <div aria-hidden="true" id="printArea">
+  </div>
+  <script src="app.js">
+  </script>
+  <div class="modal hidden staffEditorModal" id="staffEditorModal" onclick="if(event.target===this)closeStaffEditor()">
+   <div class="modalCard staffEditorCard">
+    <button class="x staffEditorClose" onclick="closeStaffEditor()" type="button">
+     ×
+    </button>
+    <div class="staffEditorTitle">
+     <h2 id="staffEditorTitle">
+      แก้ไขพนักงาน
+     </h2>
+     <p>
+      ปรับข้อมูลพนักงานและสิทธิ์การใช้งาน
+     </p>
+    </div>
+    <div class="staffProfileTop">
+     <label class="staffPhotoEditor">
+      <img alt="Staff photo" id="staffEditAvatar" src="assets/staff/avatar-owner.svg"/>
+      <span class="staffPhotoEdit">
+       <svg viewbox="0 0 24 24">
+        <path d="M4 20h4l11-11-4-4L4 16v4Z">
+        </path>
+        <path d="m13 7 4 4">
+        </path>
+       </svg>
+      </span>
+      <input accept="image/*" id="staffEditAvatarInput" type="file"/>
+      <input id="staffEditAvatarData" type="hidden"/>
+     </label>
+     <div class="staffRoleBlock">
+      <b>
+       บทบาท
+      </b>
+      <span class="staffRoleBadge" id="staffEditRole">
+       <svg aria-hidden="true" viewbox="0 0 24 24">
+        <path d="M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7-4.2-2.2L7.8 16l.8-4.7L5.2 8l4.7-.7L12 3Z">
+        </path>
+       </svg>
+      </span>
+     </div>
+    </div>
+    <input id="staffEditIndex" type="hidden"/>
+    <div class="staffEditFields">
+     <label>
+      <span>
+       <svg viewbox="0 0 24 24">
+        <circle cx="12" cy="8" r="3">
+        </circle>
+        <path d="M5 20c.8-4 3.2-6 7-6s6.2 2 7 6">
+        </path>
+       </svg>
+       ชื่อที่แสดง
+      </span>
+      <input autocomplete="off" id="staffEditName"/>
+     </label>
+     <label>
+      <span class="atIcon">
+       @
+      </span>
+      <span>
+       Username
+      </span>
+      <input autocomplete="off" id="staffEditUser"/>
+     </label>
+     <label>
+      <span>
+       <svg viewbox="0 0 24 24">
+        <rect height="10" rx="2" width="14" x="5" y="10">
+        </rect>
+        <path d="M8 10V7a4 4 0 0 1 8 0v3">
+        </path>
+       </svg>
+       Password
+      </span>
+      <input autocomplete="new-password" id="staffEditPass"/>
+     </label>
+    </div>
+    <label class="staffActiveEdit">
+     <span>
+      <b>
+       อนุญาตให้เข้าสู่ระบบ
+      </b>
+      <small>
+       เปิด/ปิดสิทธิ์การใช้งานบัญชีนี้
+      </small>
+     </span>
+     <input id="staffEditActive" type="checkbox"/>
+     <i>
+     </i>
+    </label>
+    <div class="staffCurrentNotice" id="staffCurrentNotice">
+     <i>
+     </i>
+     <span>
+      บัญชีที่กำลังเข้าสู่ระบบจะแสดงจุดสีเขียวในหน้ารายชื่อ
+     </span>
+    </div>
+    <div class="staffEditorActions">
+     <button class="softDanger" id="staffEditDelete" onclick="deleteStaffEditor()" type="button">
+      <svg viewbox="0 0 24 24">
+       <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13">
+       </path>
+      </svg>
+      ลบพนักงาน
+     </button>
+     <button class="staffCancelBtn" onclick="closeStaffEditor()" type="button">
+      ยกเลิก
+     </button>
+     <button class="primary" id="staffEditSave" onclick="saveStaffEditor()" type="button">
+      บันทึกข้อมูล
+     </button>
+    </div>
+   </div>
+  </div>
+ </body>
+</html>
