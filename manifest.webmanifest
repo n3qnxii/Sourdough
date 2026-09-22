@@ -1,1 +1,8 @@
-{"name":"Sourdough POS","short_name":"Sourdough","start_url":"./index.html","display":"standalone","background_color":"#f7efe2","theme_color":"#68401f"}
+{
+  "name": "Sourdough POS",
+  "short_name": "Sourdough",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f7efe2",
+  "theme_color": "#68401f"
+}
