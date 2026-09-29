@@ -1,8 +1,11 @@
 {
   "name": "Sourdough POS",
   "short_name": "Sourdough",
-  "start_url": "./index.html",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
   "display": "standalone",
   "background_color": "#f7efe2",
-  "theme_color": "#68401f"
+  "theme_color": "#68401f",
+  "lang": "th"
 }
