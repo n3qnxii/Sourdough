@@ -1315,7 +1315,7 @@
     <h2 id="qrFullAmount">
     </h2>
     <p>
-     Sourdough · PromptPay
+     ชำระเงิน
     </p>
    </div>
   </div>
@@ -1445,74 +1445,32 @@
     <h2 id="editorTitle">
      เพิ่มเมนู
     </h2>
-    <form class="formGrid" id="productForm">
+    <form class="formGrid productEditorForm" id="productForm">
      <input id="editId" type="hidden"/>
-     <div class="wide editorPhotoTop">
-      <label>
-       รูปสินค้า
-       <input accept="image/*" id="editImage" type="file"/>
-       <small class="imageHelp">
-        เลือกรูปแล้วลากจัดตำแหน่งและซูมในกรอบได้ทันที
-       </small>
-      </label>
-      <div class="editablePreview" id="imagePreview">
+     <section class="loafEditorSection fullLoafSection wide">
+      <div class="loafSectionHead"><div><span>FULL LOAF</span><h3>ข้อมูลเต็มโลฟ / สินค้าปกติ</h3></div><small>ข้อมูลหลักของสินค้า</small></div>
+      <div class="loafSectionGrid">
+       <div class="wide editorPhotoTop"><label>รูปสินค้า<input accept="image/*" id="editImage" type="file"/><small class="imageHelp">เลือกรูปแล้วลากจัดตำแหน่งและซูมในกรอบได้ทันที</small></label><div class="editablePreview" id="imagePreview"></div></div>
+       <label>ชื่อสินค้า<input id="editName" required=""/></label>
+       <label>หมวดหมู่<select id="editCategory"></select></label>
+       <label>ราคาเต็ม/ปกติ<input id="editPrice" required="" type="number"/></label>
+       <label>ต้นทุนเต็มโลฟ / ปกติ<input id="editCost" type="number"/></label>
+       <label>สต๊อกเต็มโลฟ / ปกติ<input id="editStock" type="number" min="0"/></label>
+       <label class="wide">ข้อมูลเตรียม/วัตถุดิบ<textarea id="editPrep" placeholder="เช่น หั่นครึ่ง, แพ็กถุง, งาดำ... (แก้ไขได้)"></textarea></label>
       </div>
-     </div>
-     <label>
-      ชื่อสินค้า
-      <input id="editName" required=""/>
-     </label>
-     <label>
-      หมวดหมู่
-      <select id="editCategory">
-      </select>
-     </label>
-     <label>
-      ราคาเต็ม/ปกติ
-      <input id="editPrice" required="" type="number"/>
-     </label>
-     <label class="wide halfToggle">
-      <input id="hasHalf" type="checkbox"/>
-      สินค้านี้มีตัวเลือกครึ่งโลฟ
-     </label>
-     <div class="wide halfFields" id="halfFields">
-      <label>
-       ราคาครึ่งโลฟ
-       <input id="editHalf" type="number"/>
-      </label>
-      <label>
-       ต้นทุนครึ่งโลฟ
-       <input id="editHalfCost" type="number"/>
-      </label>
-      <label>
-       ชื่อครึ่งโลฟ
-       <input id="editHalfName" placeholder="ครึ่งโลฟ"/>
-      </label>
-      <label>
-       รูปครึ่งโลฟ
-       <input accept="image/*" id="editHalfImage" type="file"/>
-       <small class="imageHelp">
-        เลือกรูปแล้วสามารถครอป เลื่อน และซูมได้
-       </small>
-      </label>
-      <div class="editablePreview" id="halfImagePreview">
+     </section>
+     <label class="wide halfToggle halfChoiceCard"><input id="hasHalf" type="checkbox"/><span><b>สินค้านี้มีตัวเลือกครึ่งโลฟ</b><small>ติ๊กเพื่อเปิดข้อมูล ราคา รูป และสต๊อกของครึ่งโลฟ</small></span></label>
+     <section class="loafEditorSection halfLoafSection wide halfFields" id="halfFields">
+      <div class="loafSectionHead"><div><span>HALF LOAF</span><h3>ข้อมูลครึ่งโลฟ</h3></div><small>ใช้เฉพาะสินค้าที่มีครึ่งโลฟ</small></div>
+      <div class="loafSectionGrid">
+       <label>ชื่อครึ่งโลฟ<input id="editHalfName" placeholder="ครึ่งโลฟ"/></label>
+       <label>ราคาครึ่งโลฟ<input id="editHalf" type="number"/></label>
+       <label>ต้นทุนครึ่งโลฟ<input id="editHalfCost" type="number"/></label>
+       <label id="editHalfStockWrap">สต๊อกครึ่งโลฟ<input id="editHalfStock" type="number" min="0"/></label>
+       <div class="wide halfPhotoEditor"><label>รูปครึ่งโลฟ<input accept="image/*" id="editHalfImage" type="file"/><small class="imageHelp">เลือกรูปแล้วสามารถครอป เลื่อน และซูมได้</small></label><div class="editablePreview" id="halfImagePreview"></div></div>
       </div>
-     </div>
-     <label>
-      ต้นทุน
-      <input id="editCost" type="number"/>
-     </label>
-     <label>
-      สต๊อก
-      <input id="editStock" type="number"/>
-     </label>
-     <label class="wide">
-      ข้อมูลเตรียม/วัตถุดิบ
-      <textarea id="editPrep" placeholder="เช่น หั่นครึ่ง, แพ็กถุง, งาดำ... (แก้ไขได้)"></textarea>
-     </label>
-     <button class="primary wide">
-      บันทึกเมนู
-     </button>
+     </section>
+     <button class="primary wide editorSaveButton">บันทึกเมนู</button>
     </form>
    </div>
   </div>
@@ -1531,7 +1489,7 @@
      </label>
      <label>
       เบอร์โทร
-      <input id="prePhone" inputmode="tel"/>
+      <input id="prePhone" type="tel" inputmode="numeric" pattern="[0-9]*" autocomplete="tel"/>
      </label>
      <label>
       วันที่รับ
