@@ -268,7 +268,7 @@ db.products.forEach((p) => {
 // Preserve saved references to bundled branding after moving assets.
 const bundledImagePaths = {
   "login-bg.png": "assets/branding/login-bg.png",
-  "login-logo-transparent.png": "assets/branding/login-logo-transparent.png",
+  "login-logo-transparent.png": "login-logo-transparent.png",
   "logo.png": "assets/branding/logo.png",
   "shop-logo-transparent.png": "assets/branding/shop-logo-transparent.png",
 };
@@ -3129,7 +3129,7 @@ $("#removeQrImage")?.addEventListener("click", () => {
 /* v3.9 settings, export, half-loaf and receipt refinements */
 (function () {
   const logo = document.querySelector(".loginLogo");
-  if (logo) logo.src = "assets/branding/login-logo-transparent.png";
+  if (logo) logo.src = "login-logo-transparent.png";
   const hasHalf = $("#hasHalf"),
     halfFields = $("#halfFields");
   function syncHalf() {
