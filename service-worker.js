@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sourdough-pos-v598';
+const CACHE_NAME = 'sourdough-pos-v627';
 
 const APP_SHELL = [
   './',
@@ -47,18 +47,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets use the current versioned cache, with network fallback.
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-
-      return fetch(request).then((response) => {
-        if (response.ok && url.origin === self.location.origin) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-        }
+  // Code files are network-first so GitHub Pages receives hotfixes immediately.
+  if (url.pathname.endsWith('/app.js') || url.pathname.endsWith('/style.css')) {
+    event.respondWith(
+      fetch(request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
         return response;
-      });
-    })
+      }).catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request).then((cached) => cached || fetch(request).then((response) => {
+      if (response.ok && url.origin === self.location.origin) {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+      }
+      return response;
+    }))
   );
 });

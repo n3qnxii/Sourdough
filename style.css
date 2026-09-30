@@ -3499,3 +3499,510 @@ html[lang="en"] .product.saleOff::after{
 
 /* v5.97 report chart reliability */
 .reportCostHint{display:block;margin-top:8px;color:#9a806e;font-size:12px;text-align:left}
+
+/* v5.99 print preview + report cost/profit colour fix */
+.splitTrack .costSide,.splitTrack .costSide.costRed{background:linear-gradient(90deg,#ef8b82,#c94e49)!important;opacity:1!important;visibility:visible!important;z-index:2!important}
+.splitTrack .profitSide,.splitTrack .profitSide.profitGreen{background:linear-gradient(90deg,#6ca67c,#34704b)!important;opacity:1!important;visibility:visible!important;z-index:1!important}
+.printPreviewOverlay{position:fixed;inset:0;background:rgba(42,31,24,.55);backdrop-filter:blur(7px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px}.printPreviewDialog{width:min(760px,96vw);height:min(900px,94vh);background:#fffdf9;border-radius:24px;box-shadow:0 28px 80px rgba(45,29,18,.3);display:flex;flex-direction:column;overflow:hidden;border:1px solid #eadbc9}.printPreviewHead{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #eee2d5}.printPreviewHead small{font-size:11px;letter-spacing:.14em;color:#9a7b64}.printPreviewHead h2{margin:3px 0 0;font-size:20px;color:#3f2a1e}.printPreviewClose{width:40px;height:40px;border:0;border-radius:50%;background:#f5ede4;font-size:25px;color:#65422e;cursor:pointer}.printPreviewStage{flex:1;overflow:auto;background:#eee9e3;padding:28px;display:flex;justify-content:center;align-items:flex-start}.printPaper{width:min(var(--paper-mm),100%);min-height:320px;background:#fff;color:#111;box-shadow:0 10px 32px rgba(0,0,0,.15);padding:12px;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans Thai",Arial,sans-serif}.printPaper .ticket{width:100%;font-size:12px;line-height:1.45}.printPaper .ticketLogo{display:block;max-width:120px;max-height:70px;object-fit:contain;margin:0 auto 6px}.printPaper .receiptTitle{text-align:center;font-size:20px;font-weight:800}.printPaper .receiptSub{text-align:center;font-size:9px;letter-spacing:1.2px;margin:3px 0 8px}.printPaper hr{border:0;border-top:1px dashed #888;margin:8px 0}.printPaper .meta,.printPaper .r{display:flex;justify-content:space-between;gap:10px;margin:5px 0}.printPaper .meta span:last-child{text-align:right}.printPaper .receiptItem{display:grid;grid-template-columns:1fr auto;gap:8px;padding:6px 0;border-bottom:1px dotted #bbb}.printPaper .receiptItemName{font-weight:700}.printPaper .receiptItem small{display:block;color:#666;font-size:10px}.printPaper .receiptQty{font-weight:800;margin-right:5px}.printPaper .receiptTotal{font-size:17px;border-top:2px solid #111;padding-top:7px}.printPaper .paymentBox{border:1px solid #222;border-radius:7px;padding:6px 8px;margin:8px 0}.printPaper .thanks{text-align:center;font-weight:800;font-size:14px;margin-top:12px}.printPaper .fresh{text-align:center;font-size:9px;letter-spacing:1px;margin-top:3px}.printPaper .kitchenTicket h1,.printPaper .kitchenTicket h2,.printPaper .kitchenTicket h3{text-align:center;margin:3px 0}.printPaper .kitem{font-size:15px;padding:7px 0;border-bottom:1px dashed #888}.printPaper .summaryTitle{text-align:center;font-size:18px;font-weight:800}.printPreviewActions{padding:15px 20px;border-top:1px solid #eee2d5;display:flex;justify-content:flex-end;gap:10px}.printPreviewActions button{min-width:120px;height:46px;border-radius:13px;border:1px solid #dfcbb9;background:#fff;color:#67452f;font-weight:800;font-size:15px;cursor:pointer}.printPreviewActions .printPreviewConfirm{background:#6b432d;color:#fff;border-color:#6b432d}@media(max-width:700px){.printPreviewOverlay{padding:8px}.printPreviewStage{padding:14px}.printPreviewDialog{height:96vh;border-radius:18px}}
+
+/* v6.00 — report semantics: COST = red, PROFIT = green */
+.splitProfitCard .splitLabels>div:first-child b,
+.splitProfitCard .splitLabels>div:first-child strong,
+.splitProfitCard .splitLabels>div:first-child em{color:#c94e49!important}
+.splitProfitCard .splitLabels>div:last-child b,
+.splitProfitCard .splitLabels>div:last-child strong,
+.splitProfitCard .splitLabels>div:last-child em{color:#34704b!important}
+.splitTrack .costSide,.splitTrack .costSide.costRed{background:linear-gradient(90deg,#ef8b82,#c94e49)!important}
+.splitTrack .profitSide,.splitTrack .profitSide.profitGreen{background:linear-gradient(90deg,#6ca67c,#34704b)!important}
+#posPrintFrame{position:fixed!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+
+
+/* v6.05 — Native browser print-preview layout */
+@media print{
+  html,body{
+    margin:0!important;
+    padding:0!important;
+    background:#fff!important;
+    color:#000!important;
+  }
+  body>*:not(#printArea){display:none!important}
+  #printArea{
+    display:block!important;
+    visibility:visible!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    background:#fff!important;
+  }
+  #printArea .ticket{
+    width:76mm!important;
+    max-width:76mm!important;
+    margin:0 auto!important;
+    padding:3mm!important;
+    box-sizing:border-box!important;
+    font-family:-apple-system,BlinkMacSystemFont,"Noto Sans Thai",Arial,sans-serif!important;
+    font-size:12px!important;
+    line-height:1.45!important;
+    color:#000!important;
+    background:#fff!important;
+  }
+  #printArea .ticketLogo{
+    display:block!important;
+    width:auto!important;
+    max-width:34mm!important;
+    max-height:18mm!important;
+    object-fit:contain!important;
+    margin:0 auto 5px!important;
+  }
+  #printArea .receiptTitle{
+    text-align:center!important;
+    font-size:20px!important;
+    font-weight:800!important;
+    line-height:1.15!important;
+  }
+  #printArea .receiptSub{
+    text-align:center!important;
+    font-size:9px!important;
+    letter-spacing:1.1px!important;
+    margin:3px 0 8px!important;
+  }
+  #printArea hr{
+    border:0!important;
+    border-top:1px dashed #555!important;
+    margin:8px 0!important;
+  }
+  #printArea .meta,
+  #printArea .r{
+    display:flex!important;
+    justify-content:space-between!important;
+    align-items:flex-start!important;
+    gap:8px!important;
+    margin:5px 0!important;
+  }
+  #printArea .r>span{flex:1!important}
+  #printArea .r>b{white-space:nowrap!important}
+  #printArea .receiptItem{
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    gap:8px!important;
+    padding:6px 0!important;
+    border-bottom:1px dotted #aaa!important;
+  }
+  #printArea .receiptItemName{font-weight:700!important}
+  #printArea .receiptItem small{
+    display:block!important;
+    font-size:10px!important;
+    color:#333!important;
+  }
+  #printArea .receiptTotal{
+    font-size:17px!important;
+    border-top:2px solid #111!important;
+    padding-top:7px!important;
+    margin-top:7px!important;
+  }
+  #printArea .paymentBox{
+    border:1px solid #111!important;
+    border-radius:5px!important;
+    padding:6px 8px!important;
+    margin:8px 0!important;
+  }
+  #printArea .thanks{
+    text-align:center!important;
+    font-weight:800!important;
+    font-size:14px!important;
+    margin-top:12px!important;
+  }
+  #printArea .fresh{
+    text-align:center!important;
+    font-size:9px!important;
+    letter-spacing:1px!important;
+    margin-top:3px!important;
+  }
+  #printArea .kitchenTicket h1,
+  #printArea .kitchenTicket h2,
+  #printArea .kitchenTicket h3{
+    text-align:center!important;
+    margin:4px 0!important;
+  }
+  #printArea .kitchenTicket h1{font-size:23px!important}
+  #printArea .kitem{
+    font-size:16px!important;
+    padding:8px 0!important;
+    margin:0!important;
+    border-bottom:1px dashed #777!important;
+  }
+  #printArea .summaryTitle{
+    text-align:center!important;
+    font-size:18px!important;
+    font-weight:800!important;
+  }
+  @page{margin:4mm}
+}
+
+
+/* v6.06 — force preview above every POS modal */
+#posPrintPreview.printPreviewOverlay{
+  position:fixed!important;inset:0!important;z-index:2147483647!important;
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  pointer-events:auto!important;
+}
+#posPrintPreview .printPreviewDialog{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+}
+@media print{#posPrintPreview{display:none!important}}
+
+
+/* v6.07 — guaranteed visible print preview */
+#posPrintPreviewV607{
+  position:fixed!important; inset:0!important; z-index:2147483647!important;
+  display:flex!important; align-items:center!important; justify-content:center!important;
+  padding:18px!important; background:rgba(20,18,16,.72)!important;
+  visibility:visible!important; opacity:1!important; pointer-events:auto!important;
+}
+#posPrintPreviewV607 .v607PreviewCard{
+  width:min(760px,96vw)!important; height:min(900px,94vh)!important;
+  display:flex!important; flex-direction:column!important; overflow:hidden!important;
+  border-radius:22px!important; background:#f7f3ee!important;
+  box-shadow:0 24px 80px rgba(0,0,0,.35)!important;
+}
+#posPrintPreviewV607 .v607PreviewHeader{
+  flex:0 0 auto!important; display:flex!important; align-items:center!important;
+  justify-content:space-between!important; gap:16px!important;
+  padding:16px 18px!important; background:#fff!important; border-bottom:1px solid #e5ddd5!important;
+}
+#posPrintPreviewV607 .v607PreviewHeader small{font-size:11px!important;letter-spacing:1.4px!important;color:#8a786b!important}
+#posPrintPreviewV607 .v607PreviewHeader h2{margin:2px 0 0!important;font-size:20px!important;color:#211b17!important}
+#posPrintPreviewV607 .v607PreviewHeader button{
+  width:42px!important;height:42px!important;border:0!important;border-radius:50%!important;
+  background:#eee7e0!important;color:#2c241f!important;font-size:28px!important;line-height:1!important;
+}
+#posPrintPreviewV607 .v607PreviewBody{
+  flex:1 1 auto!important; min-height:0!important; overflow:auto!important;
+  padding:24px!important; background:#ddd7d1!important;
+}
+#posPrintPreviewV607 .v607Paper{
+  min-height:420px!important; margin:0 auto!important; padding:18px!important;
+  box-sizing:border-box!important; background:#fff!important; color:#111!important;
+  box-shadow:0 5px 22px rgba(0,0,0,.18)!important;
+}
+#posPrintPreviewV607 .v607PreviewFooter{
+  flex:0 0 auto!important; display:flex!important; justify-content:flex-end!important;
+  gap:10px!important; padding:14px 18px!important; background:#fff!important; border-top:1px solid #e5ddd5!important;
+}
+#posPrintPreviewV607 .v607PreviewFooter button{
+  min-width:120px!important;height:46px!important;border-radius:12px!important;
+  font-weight:800!important;font-size:15px!important;
+}
+#posPrintPreviewV607 .v607Back{background:#f3eee9!important;border:1px solid #d8ccc1!important;color:#332922!important}
+#posPrintPreviewV607 .v607Print{background:#2c211b!important;border:1px solid #2c211b!important;color:#fff!important}
+
+/* Only when Print inside the preview is pressed */
+@media print{
+  html.v607-printing body>*:not(#printAreaV607){display:none!important}
+  html.v607-printing #printAreaV607{
+    display:block!important; width:100%!important; margin:0!important; padding:0!important;
+    background:#fff!important; color:#000!important;
+  }
+  html.v607-printing #printAreaV607 .ticket{
+    width:76mm!important; max-width:76mm!important; margin:0 auto!important;
+    padding:3mm!important; box-sizing:border-box!important;
+  }
+  #posPrintPreviewV607{display:none!important}
+  @page{margin:4mm}
+}
+
+
+
+/* v6.09 direct UI fixes */
+#preProducts .preSelectionHead{background:#4b2f22!important;color:#fff!important}
+#preProducts .preSelectionHead small,#preProducts .preSelectionHead b,#preProducts .preSelectionHead span{color:#fff!important;opacity:1!important}
+/* number inside the round counter = brown, not blue/white */
+#preProducts .preSelectionCount{background:#fff!important;color:#6b432d!important;border:1px solid #ead8c8!important}
+#preProducts .preMenuBadge{background:#fff!important;color:#6b432d!important;border:1px solid #e6d3c1!important}
+
+
+/* v6.10 — New pre-order selected quantity: brown number in the circle */
+#preProducts .preSelectionCount{
+  color:#6b3f2a!important;
+  -webkit-text-fill-color:#6b3f2a!important;
+  font-weight:900!important;
+}
+#preProducts .preMenuBadge{
+  color:#6b3f2a!important;
+  -webkit-text-fill-color:#6b3f2a!important;
+  font-weight:900!important;
+}
+
+/* v6.10 browser print stage — preview remains in-app until user presses Print */
+#posPrintArea610{display:none}
+@media print{
+  html.pos-print-610 body>*:not(#posPrintArea610){display:none!important}
+  html.pos-print-610 #posPrintArea610{
+    display:block!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    background:#fff!important;
+    color:#000!important;
+  }
+  html.pos-print-610 #posPrintArea610 .ticket{
+    width:76mm!important;
+    max-width:76mm!important;
+    margin:0 auto!important;
+    padding:3mm!important;
+    box-sizing:border-box!important;
+  }
+  @page{margin:4mm}
+}
+
+/* v6.11 Payment focus */
+#payModal.modal:not(.hidden){position:fixed!important;inset:0!important;z-index:1000000!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:24px!important;box-sizing:border-box!important;background:rgba(37,27,21,.68)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;overscroll-behavior:contain!important}
+#payModal .payBox{max-height:94vh!important;overflow:auto!important;box-shadow:0 30px 90px rgba(0,0,0,.32)!important}
+body:has(#payModal:not(.hidden)){overflow:hidden!important}
+#cashArea .cashInputWrap{display:grid!important;grid-template-columns:auto 1fr!important;align-items:center!important;gap:14px!important;padding:15px 18px!important;margin:16px 0 12px!important;border:1px solid #e5d5c7!important;border-radius:18px!important;background:#fffaf6!important;color:#6b4a38!important;font-size:15px!important;font-weight:800!important}
+#cashArea .cashInputWrap>span{grid-column:2!important;color:#a18a79!important;font-size:12px!important;font-weight:500!important}
+#cashInput{width:100%!important;min-width:0!important;border:0!important;outline:0!important;background:transparent!important;text-align:right!important;color:#3d271c!important;-webkit-text-fill-color:#3d271c!important;font-size:clamp(36px,5vw,54px)!important;line-height:1!important;font-weight:900!important;letter-spacing:-1px!important;padding:4px 0!important}
+#cashArea .cashDisplay{display:none!important}
+#cashArea .changeRow{display:grid!important;grid-template-columns:1fr 44px!important;gap:9px!important;align-items:stretch!important;margin-top:12px!important}
+#cashArea .changeRow .change{margin:0!important;min-height:58px!important;border-radius:15px!important}
+.clearReceivedBtn{width:44px!important;min-width:44px!important;min-height:58px!important;border:1px solid #f1c9c4!important;border-radius:14px!important;background:#fff0ee!important;color:#c3483e!important;display:grid!important;place-items:center!important;padding:0!important;cursor:pointer!important}
+.clearReceivedBtn svg{width:20px!important;height:20px!important;fill:none!important;stroke:currentColor!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.clearReceivedBtn:active{transform:scale(.96)!important;background:#fbe0dd!important}
+
+.successNoteBox{margin:14px 0 4px;text-align:left;background:#fffaf5;border:1px solid #ead8c8;border-radius:16px;padding:12px}.successNoteBox label{display:flex;justify-content:space-between;font-weight:800;color:#503324;margin-bottom:8px}.successNoteBox label small,.successNoteBox>small{color:#9a8473;font-weight:500}.successNoteRow{display:grid;grid-template-columns:1fr auto;gap:8px}.successNoteRow input{min-width:0;height:44px;border:1px solid #dfcdbc;border-radius:11px;padding:0 12px;font-size:15px}.successNoteRow button{border:0;border-radius:11px;background:#69412c;color:#fff;font-weight:800;padding:0 15px}
+.reportMiniGrid .reportPayDrill{appearance:none;text-align:left;font:inherit;cursor:pointer;border:1px solid #ead8c8!important}.reportPayDrill small{display:block;color:#8f7563;font-size:11px}.reportPaymentOverlay{position:fixed;inset:0;z-index:2147483000;background:rgba(35,24,18,.62);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px}.reportPaymentDialog{width:min(620px,95vw);max-height:86vh;overflow:hidden;background:#fffaf6;border-radius:20px;display:flex;flex-direction:column}.reportPaymentDialog header{padding:16px 18px;background:#fff;display:flex;justify-content:space-between;align-items:center}.reportPaymentDialog header button{width:38px;height:38px;border:0;border-radius:50%;font-size:24px}.reportPaymentTotal{display:flex;gap:12px;padding:14px 18px;background:#6a422d;color:#fff}.reportPaymentTotal b{font-size:26px}.reportPaymentTotal small{margin-left:auto}.reportPaymentRows{padding:10px 16px 18px;overflow:auto}.reportPaymentRows article{padding:12px 4px;border-bottom:1px solid #eadfd6}.reportPaymentRows article>div{display:flex;justify-content:space-between;gap:14px}.reportPaymentRows article small{display:block;color:#9b8778}.reportPaymentRows article strong{font-size:18px}
+.preorderPageHead .countBadge,.preorderPageHead .badge,.preHeadActions .countBadge,.preHeadActions .badge,[data-pre-count],.preCount,.preBadge{background:#4b2d20!important;color:#fff!important;border-color:#4b2d20!important}.preorderPageHead .countBadge *,.preorderPageHead .badge *,.preHeadActions .countBadge *,.preHeadActions .badge *,[data-pre-count] *,.preCount *,.preBadge *{color:#fff!important}
+.posPreview612{position:fixed;inset:0;z-index:2147483647;background:rgba(28,19,14,.76);display:flex;align-items:center;justify-content:center;padding:18px}.posPreview612Card{width:min(760px,96vw);height:min(900px,94vh);background:#f7f2ec;border-radius:22px;overflow:hidden;display:flex;flex-direction:column}.posPreview612Card>header{background:#fff;padding:16px 18px;display:flex;justify-content:space-between;align-items:center}.posPreview612Card>header h2{margin:3px 0}.posPreview612Card>header button{width:42px;height:42px;border:0;border-radius:50%;font-size:28px}.posPreview612Card>main{flex:1;min-height:0;overflow:auto;padding:24px;background:#d8d2cc}.posPreview612Paper{width:min(80mm,100%);min-height:420px;margin:auto;background:#fff;color:#111;padding:18px;box-sizing:border-box}.posPreview612Card>footer{background:#fff;padding:14px 18px;display:flex;justify-content:flex-end;gap:10px}.posPreview612Card>footer button{height:46px;min-width:120px;border-radius:12px;font-weight:800}.posPreview612Card>footer .print612{background:#5a3524;color:#fff;border:0}#posPrintArea612{display:none}
+@media print{html.pos-print-612 body>*:not(#posPrintArea612){display:none!important}html.pos-print-612 #posPrintArea612{display:block!important;position:static!important;width:80mm!important;margin:0!important;padding:0!important;background:#fff!important;color:#111!important}@page{size:80mm auto;margin:3mm}}
+#payModal .payBox,#payModal #cashArea,#payModal #qrArea,#payModal .qrWrap,#payModal #qrcode{background:#fff!important}#payModal .method{margin:6px 0 8px!important}#payModal #cashArea .cashInputWrap{background:#fff!important;margin:4px 0 7px!important}#payModal .quickCash{margin:4px 0 7px!important;grid-template-columns:repeat(3,1fr)!important}#payModal .quickCash button{background:#fff!important;border:1px solid #dfd2c6!important;min-height:45px!important}#payModal .quickCash .exactCash{background:#5b3823!important;color:#fff!important}.reportMiniGrid .reportPayDrill{background:#fff!important;border:1px solid #eadfd6!important;padding:16px 18px!important;display:grid!important;grid-template-columns:auto 1fr!important;column-gap:12px!important;row-gap:4px!important}.reportPaymentDialog,.reportPaymentDialog header,.reportPaymentTotal,.reportPaymentRows,.reportPaymentItem,.cashDetailGrid>div,.reportPayNote{background:#fff!important}.reportPaymentTotal{color:#3f2b20!important;border-bottom:1px solid #eee4dc!important;padding:16px 20px!important;display:flex!important;justify-content:space-between!important}.reportPaymentItem{border:1px solid #eee2d8!important;border-radius:16px!important;padding:14px 16px!important;margin-top:10px!important}.reportPayTop{display:flex!important;justify-content:space-between!important;gap:16px!important}.reportPayTop small{display:block!important;margin-top:4px!important;color:#968275!important}.cashDetailGrid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-top:12px!important}.cashDetailGrid>div,.reportPayNote{border:1px solid #eee5dd!important;border-radius:12px!important;padding:10px 12px!important}.cashDetailGrid span,.reportPayNote span{display:block!important;font-size:11px!important;color:#9b887b!important;margin-bottom:4px!important}.reportPayNote{margin-top:10px!important}.orderCustomerNote{margin:10px 16px!important;padding:11px 13px!important;border:1px solid #eadfd6!important;border-radius:13px!important;background:#fff!important;display:flex!important;justify-content:space-between!important;gap:14px!important}#posPreview612,.posPreview612{z-index:2147483647!important;display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}.posPreview612Card,.posPreview612Paper{background:#fff!important}
+/* v6.14 */
+
+#preorderModal:not(.hidden),#editorModal:not(.hidden){position:fixed!important;inset:0!important;z-index:1000000!important;background:rgba(38,27,20,.68)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important;overscroll-behavior:contain!important}
+#preorderModal .modalBox,#editorModal .modalBox{max-height:92vh!important;overflow:auto!important;overscroll-behavior:contain!important}
+body.staff-session nav button[data-page="reports"],body.staff-session nav button[data-page="settings"]{display:none!important}
+#search{pointer-events:auto!important;position:relative!important;z-index:2!important}
+
+/* payment: selected cash keypad / QR is immediately under method tabs at top */
+#payModal .payBox{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;max-height:94vh!important}
+#payModal .eyebrow{order:1!important}#payModal .payTotal{order:2!important}#payModal .payTaxSummary{order:3!important}#payModal .method{order:4!important}
+#payModal #cashArea,#payModal #qrArea{order:5!important;flex:0 0 auto!important;margin-top:0!important}
+#payModal #confirmPay{order:6!important;margin-top:10px!important}
+#cashPadModal{z-index:2147483001!important;align-items:flex-start!important;padding-top:5vh!important}
+#cashPadModal .modalBox,#cashPadModal .cashPadBox{margin-top:0!important}
+#payModal #qrArea .qrWrap{margin:4px auto!important}
+#payModal #qrArea #qrcode img,#payModal #qrArea #qrcode canvas{max-width:210px!important;max-height:210px!important}
+
+/* reliable same-window print */
+#posPrintArea612{display:none}
+@media print{
+ html.pos-print-612 body>*:not(#posPrintArea612){display:none!important}
+ html.pos-print-612 #posPrintArea612{display:block!important;position:static!important;width:80mm!important;margin:0!important;padding:0!important;background:#fff!important;color:#111!important}
+ html.pos-print-612 #posPrintArea612 *{visibility:visible!important}
+ @page{size:80mm auto;margin:3mm}
+}
+
+/* v6.15 */
+.successNoteSaved{min-height:20px;margin-top:7px;font-size:13px;font-weight:800;color:#16803c;opacity:0;transition:opacity .15s}.successNoteSaved.show{opacity:1}
+.orderCustomerNote.noteOnly{display:block!important;background:#fffaf4!important;color:#5a3825!important}.orderCustomerNote.noteOnly b{display:block!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important}
+.posPrintPreview615{position:fixed!important;inset:0!important;z-index:2147483647!important;background:rgba(28,19,14,.78)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important}
+.print615Card{width:min(760px,96vw)!important;height:min(900px,94vh)!important;background:#f7f2ec!important;border-radius:22px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.print615Card>header{background:#fff!important;padding:16px 18px!important;display:flex!important;justify-content:space-between!important;align-items:center!important}.print615Card>header button{width:42px!important;height:42px!important;border:0!important;border-radius:50%!important;font-size:28px!important}
+.print615Card>main{flex:1!important;min-height:0!important;overflow:auto!important;padding:24px!important;background:#d8d2cc!important}.print615Paper{width:min(80mm,100%)!important;min-height:420px!important;margin:auto!important;background:#fff!important;color:#111!important;padding:18px!important;box-sizing:border-box!important}
+.print615Card>footer{background:#fff!important;padding:14px 18px!important;display:flex!important;justify-content:flex-end!important;gap:10px!important}.print615Card>footer button{height:46px!important;min-width:120px!important;border-radius:12px!important;font-weight:800!important}
+html.posPrinting615 #posPrintArea615{display:block!important;width:80mm!important;margin:0!important;padding:0!important;background:#fff!important;color:#111!important}@page{size:80mm auto;margin:3mm}}
+
+
+.reportPaymentOverlay{overflow:hidden!important;overscroll-behavior:contain!important}.reportPaymentDialog{max-height:88vh!important;overflow:hidden!important;background:#fff!important}.reportPaymentRows{flex:1!important;min-height:0!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;background:#fff!important}.reportPaymentItem,.cashDetailGrid>div,.reportPayNote{background:#fff!important}.reportPayNote b{white-space:pre-wrap!important;overflow-wrap:anywhere!important}
+html.posPrinting616 #posPrintArea616{display:block!important;width:80mm!important;margin:0!important;padding:0!important;background:#fff!important;color:#111!important}html.posPrinting616 #posPrintArea616 *{visibility:visible!important}@page{size:80mm auto;margin:3mm}}
+
+
+/* Modal and print behavior */
+body.page-locked{
+  position:fixed;
+  left:0;
+  right:0;
+  width:100%;
+  overflow:hidden!important;
+}
+.modal:not(.hidden){
+  overscroll-behavior:contain;
+}
+.modal:not(.hidden) .modalBox,
+.modal:not(.hidden) .modalCard{
+  max-height:92vh;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Settings is a normal page and must always be vertically scrollable when no dialog is open. */
+#settings.active{
+  overflow:visible;
+  min-height:calc(100vh - 176px);
+}
+#settings .settingsPanels,
+#settings .settingsPanel.active,
+#settings .settingsCard{
+  overflow:visible;
+}
+
+.reportPaymentOverlay{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  overflow:hidden!important;
+  overscroll-behavior:contain;
+}
+.reportPaymentDialog{
+  max-height:88vh!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+  background:#fff!important;
+}
+.reportPaymentRows{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+
+/* Single in-POS print preview */
+.posPrintPreview{
+  position:fixed;
+  inset:0;
+  z-index:2147483647;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(32,22,16,.76);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  overscroll-behavior:contain;
+}
+.posPrintDialog{
+  width:min(760px,96vw);
+  height:min(900px,94vh);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-radius:22px;
+  background:#fffdf9;
+  box-shadow:0 28px 90px rgba(0,0,0,.3);
+}
+.posPrintHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:16px 18px;
+  background:#fff;
+  border-bottom:1px solid #eadfd5;
+}
+.posPrintHead small{font-size:11px;letter-spacing:.12em;color:#927662;font-weight:800}
+.posPrintHead h2{margin:3px 0 0;color:#3f2a1e}
+.posPrintClose{width:42px;height:42px;border:0;border-radius:50%;background:#f3ebe4;font-size:27px;color:#4f3322}
+.posPrintStage{flex:1;min-height:0;overflow-y:auto;padding:24px;background:#ddd7d1;overscroll-behavior:contain}
+.posPrintPaper{width:min(var(--print-width),100%);min-height:420px;margin:0 auto;padding:18px;background:#fff;color:#111;box-sizing:border-box}
+.posPrintActions{display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;background:#fff;border-top:1px solid #eadfd5}
+.posPrintActions button{min-width:120px;min-height:46px}
+
+@media print{
+  html.printing-pos body>*:not(#printArea){display:none!important}
+  html.printing-pos #printArea{
+    display:block!important;
+    visibility:visible!important;
+    width:80mm!important;
+    margin:0!important;
+    padding:0!important;
+    background:#fff!important;
+    color:#111!important;
+  }
+  html.printing-pos #printArea *{visibility:visible!important}
+  @page{size:80mm auto;margin:3mm}
+}
+
+html.page-locked,body.page-locked{
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+  touch-action:none;
+}
+body.page-locked{position:fixed!important;left:0!important;right:0!important;width:100%!important}
+body.page-locked .modal:not(.hidden) .modalBox,
+body.page-locked .modal:not(.hidden) .modalCard,
+body.page-locked .reportPaymentRows,
+body.page-locked .posPrintStage{
+  touch-action:pan-y;
+}
+#qrFull:not(.hidden){
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483500!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  overflow-y:auto!important;
+  padding:28px 16px!important;
+  overscroll-behavior:contain!important;
+}
+#qrFull .qrFullBox{
+  margin:0 auto!important;
+  flex:0 0 auto!important;
+}
+
+.exportHead{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}.exportHead h3{margin:0}.exportModeSwitch{display:flex!important;align-items:center;gap:10px;cursor:pointer;margin:0!important}.exportModeSwitch input{position:absolute;opacity:0;pointer-events:none}.exportModeSwitch i{width:48px;height:28px;border-radius:99px;background:#d9cec4;position:relative;transition:.2s}.exportModeSwitch i:after{content:'';position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 1px 5px #0002;transition:.2s}.exportModeSwitch input:checked+i{background:#68401f}.exportModeSwitch input:checked+i:after{transform:translateX(20px)}#exportDate:disabled{opacity:.45;cursor:not-allowed}
+
+.orderPaymentDetail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 18px;padding:12px;border:1px solid #ead9ca;border-radius:14px;background:#fff}
+.orderPaymentDetail>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;border:1px solid #efe2d7;border-radius:12px;background:#fff}
+.orderPaymentDetail span{color:#9a8879;font-size:13px}.orderPaymentDetail b{font-size:16px;color:#2e211a}
+#posPrintPreview{z-index:999999!important}
+@media print{
+ body>*:not(#printArea){display:none!important}
+ #printArea{display:block!important;position:static!important;width:auto!important;height:auto!important;overflow:visible!important}
+}
+
+
+/* v6.22 print preview restored */
+#successPrint,#printSummary{display:inline-flex!important;align-items:center;justify-content:center;gap:8px}
+.posPrintPreview{z-index:99999!important}
+.posPrintStage{overflow:auto;overscroll-behavior:contain}
+.heldPreRibbon{font-weight:800}
+
+/* v6.23 new print preview — independent from legacy print CSS */
+.orderPreCustomer{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#f5eee6;color:#5b3a29;font-size:12px;font-weight:800;margin-left:6px}
+.printPreviewV623{position:fixed;inset:0;background:rgba(34,24,18,.62);z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:20px;overscroll-behavior:contain}
+.printPreviewCardV623{width:min(720px,96vw);height:min(900px,94vh);background:#f7f4ef;border-radius:22px;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.35)}
+.printPreviewCardV623>header{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;background:#fff;border-bottom:1px solid #e9e1d9}.printPreviewCardV623 header small{color:#96765f;font-weight:800;letter-spacing:1.2px}.printPreviewCardV623 header h2{margin:3px 0 0;color:#3f2b20}.printPreviewCardV623 header button{border:0;background:#f1ebe5;width:38px;height:38px;border-radius:50%;font-size:24px;color:#4b3427}
+.printPreviewCardV623>main{overflow:auto;padding:28px;overscroll-behavior:contain}.printPaperV623{width:min(80mm,100%);min-height:180px;margin:auto;background:#fff;color:#111;padding:8mm 5mm;box-shadow:0 8px 30px rgba(0,0,0,.12);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans Thai",Arial,sans-serif}
+.printPreviewCardV623>footer{display:flex;justify-content:flex-end;gap:10px;padding:15px 22px;background:#fff;border-top:1px solid #e9e1d9}.printPreviewCardV623 footer button{min-width:110px;padding:12px 18px;border-radius:12px;font-weight:800}
+.pvTicket{font-size:12px;line-height:1.45}.pvLogo{display:block;max-width:34mm;max-height:18mm;object-fit:contain;margin:0 auto 5px}.pvTicket h1,.pvTicket h2,.pvTicket h3{text-align:center;margin:4px 0}.pvTag{text-align:center;font-size:9px;letter-spacing:1px}.pvTicket hr{border:0;border-top:1px dashed #777;margin:9px 0}.pvRow{display:flex;justify-content:space-between;gap:10px;margin:5px 0}.pvRow.item{padding:5px 0;border-bottom:1px dotted #bbb}.pvRow small,.pvKitchenItem small{display:block}.pvRow.total{font-size:17px;border-top:2px solid #111;padding-top:7px}.pvBox{border:1px solid #222;border-radius:6px;padding:7px;margin:8px 0}.pvPre{text-align:center;background:#eee;padding:5px;font-weight:900;margin:6px 0}.pvThanks{text-align:center;font-size:14px;font-weight:800;margin-top:12px}.pvKitchenItem{font-size:16px;padding:8px 0;border-bottom:1px dashed #888}
+#printAreaV623{display:none}
+@media print{
+ body>*:not(#printAreaV623){display:none!important}
+ #printAreaV623{display:block!important;position:static!important}
+ #printAreaV623 .pvTicket{width:74mm;margin:0 auto}
+ @page{size:80mm auto;margin:3mm}
+}
+
+/* Browser print preview for Chrome / Safari */
+body.browserPrintOpen{overflow:hidden!important}
+.browserPrintPreview{position:fixed;inset:0;z-index:2147483640;background:rgba(35,25,18,.68);display:flex;align-items:center;justify-content:center;padding:18px}
+.browserPrintCard{width:min(760px,97vw);height:min(920px,95vh);display:grid;grid-template-rows:auto 1fr auto;background:#f6f1eb;border-radius:22px;overflow:hidden;box-shadow:0 28px 90px rgba(0,0,0,.4)}
+.browserPrintCard>header{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:17px 21px;border-bottom:1px solid #e7ddd4}.browserPrintCard header small{font-size:10px;font-weight:900;letter-spacing:1.3px;color:#95715b}.browserPrintCard header h2{margin:3px 0 0;color:#3f2b20}.browserPrintCard header button{border:0;background:#f1eae4;width:40px;height:40px;border-radius:50%;font-size:25px}
+.browserPrintCard>main{overflow:auto;overscroll-behavior:contain;padding:26px 15px}.browserPrintPaper{width:min(80mm,100%);min-height:240px;margin:auto;background:#fff;color:#111;padding:8mm 5mm;box-shadow:0 8px 28px rgba(0,0,0,.13)}
+.browserPrintCard>footer{display:flex;justify-content:flex-end;gap:10px;background:#fff;padding:14px 20px;border-top:1px solid #e7ddd4}.browserPrintCard>footer button{min-width:120px;padding:12px 16px;border-radius:12px;font-weight:850}
+#browserPrintStage{display:none}
+@media print{
+  @page{size:80mm auto;margin:3mm}
+  html.browserPrinting body>*:not(#browserPrintStage){display:none!important}
+  html.browserPrinting #browserPrintStage{display:block!important;position:static!important;width:74mm!important;margin:0 auto!important;background:#fff!important;color:#111!important}
+}
+
+/* v6.27 iPad Safari print-preview visibility */
+html:has(#browserPrintPreview),body.browserPrintOpen{overflow:hidden!important}
+body.browserPrintOpen{position:static!important;top:auto!important;width:auto!important}
+#browserPrintPreview{position:fixed!important;inset:0!important;z-index:2147483647!important;-webkit-overflow-scrolling:touch}
+#browserPrintPreview .browserPrintCard{max-height:calc(100dvh - 28px)!important}
+#browserPrintPreview main{-webkit-overflow-scrolling:touch!important}
