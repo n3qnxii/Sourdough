@@ -707,6 +707,7 @@ function chooseProduct(id) {
     $("#variantChoices").innerHTML =
       `<button class="variantStockChoice ${hs < 0.5 ? "variantSoldOut" : ""}" onclick="pickVariant('${id}','half')" ${hs < 0.5 ? "disabled" : ""}><img src="${p.halfImg || p.img || "assets/branding/logo.png"}"><b>${en ? "Half loaf" : "ครึ่งโลฟ"}</b><strong>${money(p.half)}</strong><small>${en ? "Remaining" : "คงเหลือ"} ${hs}</small>${hs < 0.5 ? `<em>${en ? "Out of stock" : "สินค้าหมด"}</em>` : ""}</button><button class="variantStockChoice ${fs < 1 ? "variantSoldOut" : ""}" onclick="pickVariant('${id}','full')" ${fs < 1 ? "disabled" : ""}><img src="${p.img || "assets/branding/logo.png"}"><b>${en ? "Full loaf" : "เต็มโลฟ"}</b><strong>${money(p.price)}</strong><small>${en ? "Remaining" : "คงเหลือ"} ${fs}</small>${fs < 1 ? `<em>${en ? "Out of stock" : "สินค้าหมด"}</em>` : ""}</button>`;
     $("#variantModal").classList.remove("hidden");
+    syncModalScrollLock();
   } else addCart(p, "", p.price);
 }
 window.pickVariant = (id, v) => {
@@ -1125,6 +1126,7 @@ $("#payBtn").onclick = () => {
   $("#payTotal").textContent = money(tc.grand);
   renderPayTaxSummary(tc);
   $("#payModal").classList.remove("hidden");
+  syncModalScrollLock();
   setMethod("cash");
   renderKeypad();
   setReceived(0);
@@ -1244,6 +1246,7 @@ function renderKeypad() {
   }
   function openPad() {
     modal.classList.remove("hidden");
+    syncModalScrollLock();
     refreshPad();
     clickSound(620, 0.04);
   }
@@ -1267,12 +1270,19 @@ function renderKeypad() {
   };
   $("#cashPadUse").onclick = () => {
     modal.classList.add("hidden");
+    syncModalScrollLock();
     refreshPad();
     clickSound(820, 0.06);
   };
-  $("#cashPadClose").onclick = () => modal.classList.add("hidden");
+  $("#cashPadClose").onclick = () => {
+    modal.classList.add("hidden");
+    syncModalScrollLock();
+  };
   modal.onclick = (e) => {
-    if (e.target === modal) modal.classList.add("hidden");
+    if (e.target === modal) {
+      modal.classList.add("hidden");
+      syncModalScrollLock();
+    }
   };
   setReceived(0);
 }
@@ -2153,11 +2163,15 @@ function todayDashboard(s) {
   }
   const profitWins = profit >= cost;
   const hasCost = cost > 0;
+  // Keep a visible red cost segment whenever there are sales, even before
+  // product costs have been configured. The numeric labels remain truthful.
+  const costTrackPct = cost > 0 ? costPct : s.sales > 0 ? 8 : 0;
+  const profitTrackPct = cost > 0 ? profitPct : s.sales > 0 ? 92 : 0;
   const costHint =
     !hasCost && s.sales > 0
       ? `<small class="reportCostHint">${en ? "Set product cost to show the cost share" : "ตั้งค่าต้นทุนสินค้าเพื่อแสดงสัดส่วนต้นทุน"}</small>`
       : "";
-  return `<div class="reportHero"><div><span class="reportEyebrow">${en ? "TODAY AT A GLANCE" : "ภาพรวมวันนี้"}</span><h3>${money(s.sales)}</h3><p>${en ? "Total sales today" : "ยอดขายรวมของวันนี้"}</p></div><div class="reportOrderPill"><svg><use href="#ordersIcon"/></svg><b>${s.paid.length}</b><span>${en ? "completed" : "สำเร็จ"}</span></div></div><div class="reportMiniGrid"><button type="button" class="metricMotion reportPayDrill" data-pay-detail="cash"><svg><use href="#wallet"/></svg><span>${en ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b><small>${en ? "View payments" : "ดูรายการ"}</small></button><button type="button" class="metricMotion delay1 reportPayDrill" data-pay-detail="qr"><svg><use href="#qr"/></svg><span>PromptPay QR</span><b>${money(s.qr)}</b><small>${en ? "View payments" : "ดูรายการ"}</small></button><div class="metricMotion delay2"><svg><use href="#cancelDoc"/></svg><span>${en ? "Cancelled" : "ยกเลิก"}</span><b>${s.cancelled}</b></div></div><div class="profitCard splitProfitCard"><div class="profitHead"><div><span>${en ? "PROFIT & COST" : "กำไรและต้นทุน"}</span><h3>${en ? "Today’s balance" : "สมดุลของวันนี้"}</h3></div><span class="profitMood ${profitWins ? "good" : "warn"}">${profitWins ? (en ? "Profit leads" : "กำไรมากกว่า") : en ? "Cost leads" : "ต้นทุนมากกว่า"}</span></div><div class="splitLabels"><div class="${profitWins ? "loser" : "winner"}"><b>${en ? "Cost" : "ต้นทุน"}</b><strong>${money(cost)}</strong><em>${costPct.toFixed(1)}%</em></div><div class="${profitWins ? "winner" : "loser"} right"><b>${en ? "Profit" : "กำไร"}</b><strong>${money(profit)}</strong><em>${profitPct.toFixed(1)}%</em></div></div><div class="splitTrack"><i class="costSide ${profitWins ? "low" : "high"}" style="width:${costPct}%"></i><i class="profitSide ${profitWins ? "high" : "low"}" style="width:${profitPct}%"></i><span class="splitCenter"></span></div>${costHint}</div>`;
+  return `<div class="reportHero"><div><span class="reportEyebrow">${en ? "TODAY AT A GLANCE" : "ภาพรวมวันนี้"}</span><h3>${money(s.sales)}</h3><p>${en ? "Total sales today" : "ยอดขายรวมของวันนี้"}</p></div><div class="reportOrderPill"><svg><use href="#ordersIcon"/></svg><b>${s.paid.length}</b><span>${en ? "completed" : "สำเร็จ"}</span></div></div><div class="reportMiniGrid"><button type="button" class="metricMotion reportPayDrill" data-pay-detail="cash"><svg><use href="#wallet"/></svg><span>${en ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b><small>${en ? "View payments" : "ดูรายการ"}</small></button><button type="button" class="metricMotion delay1 reportPayDrill" data-pay-detail="qr"><svg><use href="#qr"/></svg><span>PromptPay QR</span><b>${money(s.qr)}</b><small>${en ? "View payments" : "ดูรายการ"}</small></button><div class="metricMotion delay2"><svg><use href="#cancelDoc"/></svg><span>${en ? "Cancelled" : "ยกเลิก"}</span><b>${s.cancelled}</b></div></div><div class="profitCard splitProfitCard"><div class="profitHead"><div><span>${en ? "PROFIT & COST" : "กำไรและต้นทุน"}</span><h3>${en ? "Today’s balance" : "สมดุลของวันนี้"}</h3></div><span class="profitMood ${profitWins ? "good" : "warn"}">${profitWins ? (en ? "Profit leads" : "กำไรมากกว่า") : en ? "Cost leads" : "ต้นทุนมากกว่า"}</span></div><div class="splitLabels"><div class="${profitWins ? "loser" : "winner"}"><b>${en ? "Cost" : "ต้นทุน"}</b><strong>${money(cost)}</strong><em>${costPct.toFixed(1)}%</em></div><div class="${profitWins ? "winner" : "loser"} right"><b>${en ? "Profit" : "กำไร"}</b><strong>${money(profit)}</strong><em>${profitPct.toFixed(1)}%</em></div></div><div class="splitTrack"><i class="costSide ${profitWins ? "low" : "high"}" style="width:${costTrackPct}%"></i><i class="profitSide ${profitWins ? "high" : "low"}" style="width:${profitTrackPct}%"></i><span class="splitCenter"></span></div>${costHint}</div>`;
 }
 function showReportPaymentDetails(method, key) {
   const en = db.language === "en",
@@ -3647,7 +3661,8 @@ function closeSuccessAndReset() {
   successRemaining = 5;
   currentSuccessOrderId = null;
   $("#successModal").classList.add("hidden");
-  $("#salePulse").textContent = "พร้อมรับออเดอร์ใหม่";
+  $("#salePulse").textContent =
+    db.language === "en" ? "Ready for a new order" : "พร้อมรับออเดอร์ใหม่";
   if (activePreorderPaymentId) {
     activePreorderPaymentId = null;
   }
@@ -5282,7 +5297,7 @@ document.addEventListener("click", () => setTimeout(updatePageLock, 0), true);
       E = en();
     showDocPreview(
       E ? "Today's sales summary" : "สรุปยอดขายวันนี้",
-      `<div class="dTicket"><h1>${esc(db.shopName || "Sourdough")}</h1><p class="dSub">${E ? "TODAY'S SALES SUMMARY" : "สรุปยอดขายวันนี้"} · ${esc(k)}</p><hr><div class="dRow"><span>${E ? "Total sales" : "ยอดขายรวม"}</span><b>${money(s.sales)}</b></div><div class="dRow"><span>${E ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b></div><div class="dRow"><span>PromptPay</span><b>${money(s.qr)}</b></div><div class="dRow"><span>${E ? "Cost" : "ต้นทุน"}</span><b>${money(s.cost)}</b></div><div class="dTotal"><span>${E ? "PROFIT" : "กำไร"}</span><b>${money(s.profit)}</b></div><div class="dRow"><span>${E ? "Paid orders" : "ออเดอร์ที่ชำระแล้ว"}</span><b>${(s.paid || []).length}</b></div></div>`,
+      `<div class="dTicket summaryTicket"><div class="summaryBrand"><img class="dLogo" src="${esc(shopLogoSrc())}" alt=""><div><h1>${esc(db.shopName || "Sourdough")}</h1><p class="dSub">${E ? "TODAY'S SALES SUMMARY" : "สรุปยอดขายวันนี้"}</p></div></div><div class="summaryDate">${esc(k)}</div><div class="summaryKpis"><div><span>${E ? "Total sales" : "ยอดขายรวม"}</span><b>${money(s.sales)}</b></div><div><span>${E ? "Paid orders" : "ออเดอร์ที่ชำระแล้ว"}</span><b>${(s.paid || []).length}</b></div></div><div class="summarySectionTitle">${E ? "PAYMENT BREAKDOWN" : "สรุปช่องทางชำระเงิน"}</div><div class="dRow summaryRow"><span>${E ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b></div><div class="dRow summaryRow"><span>PromptPay</span><b>${money(s.qr)}</b></div><div class="summarySectionTitle">${E ? "PROFIT OVERVIEW" : "ภาพรวมกำไร"}</div><div class="dRow summaryRow cost"><span>${E ? "Cost" : "ต้นทุน"}</span><b>${money(s.cost)}</b></div><div class="dTotal summaryProfit"><span>${E ? "Estimated profit" : "กำไรโดยประมาณ"}</span><b>${money(s.profit)}</b></div><p class="summaryFooter">${E ? "Thank you" : "ขอบคุณที่อุดหนุน"} · ${esc(db.shopName || "Sourdough")}</p></div>`,
     );
   };
   setTimeout(() => {
@@ -5628,6 +5643,7 @@ updatePageLock();
       รวมอยู่ในราคา: "included",
       บวกเพิ่ม: "added",
       รวมในราคา: "included",
+      พร้อมรับออเดอร์ใหม่: "Ready for a new order",
     },
   };
   const extra = {

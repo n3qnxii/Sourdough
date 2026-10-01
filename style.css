@@ -1,6 +1,215 @@
 * {
   box-sizing: border-box;
 }
+
+/* v7.6 mobile polish and today's summary print redesign */
+.splitProfitCard .splitLabels > div:first-child strong {
+  display: block !important;
+  min-height: 1.2em !important;
+  color: #c94e49 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.splitTrack .costSide {
+  min-width: 8% !important;
+  flex: 0 0 auto !important;
+}
+.splitTrack .profitSide {
+  flex: 0 0 auto !important;
+}
+.summaryTicket {
+  color: #3f2b20;
+  background: linear-gradient(180deg, #fffdf9 0%, #fff8f1 100%);
+}
+.summaryBrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eadbcd;
+}
+.summaryBrand .dLogo {
+  flex: 0 0 22mm;
+  width: 22mm !important;
+  height: 18mm !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+.summaryBrand h1 {
+  text-align: left;
+  font-size: 17px;
+  margin: 0;
+}
+.summaryBrand .dSub {
+  text-align: left;
+  margin: 2px 0 0;
+  color: #8c6a53;
+}
+.summaryDate {
+  margin: 10px 0 12px;
+  color: #8c6a53;
+  font-size: 10px;
+  text-align: right;
+}
+.summaryKpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+.summaryKpis > div {
+  padding: 9px;
+  border: 1px solid #eadbcd;
+  border-radius: 10px;
+  background: #fff;
+}
+.summaryKpis span,
+.summaryKpis b {
+  display: block;
+}
+.summaryKpis span {
+  color: #8c6a53;
+  font-size: 10px;
+}
+.summaryKpis b {
+  margin-top: 3px;
+  font-size: 16px;
+}
+.summarySectionTitle {
+  margin: 12px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #eadbcd;
+  color: #7a4d31;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+.summaryRow {
+  margin: 6px 0;
+}
+.summaryRow.cost b {
+  color: #c94e49;
+}
+.summaryProfit {
+  margin-top: 10px;
+  padding: 10px 0 0;
+  border-top: 2px solid #6b4328;
+  color: #34704b;
+  font-size: 17px;
+}
+.summaryFooter {
+  margin: 15px 0 0;
+  color: #8c6a53;
+  font-size: 10px;
+  text-align: center;
+}
+
+@media (max-width: 699px) {
+  #variantModal:not(.hidden),
+  #payModal:not(.hidden),
+  #preorderModal:not(.hidden),
+  #editorModal:not(.hidden),
+  #cashPadModal:not(.hidden) {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 12px !important;
+  }
+  #variantModal .modalBox,
+  #payModal .payBox,
+  #preorderModal .modalBox,
+  #editorModal .modalBox,
+  #cashPadModal .cashPadBox {
+    width: min(100%, 430px) !important;
+    max-width: 430px !important;
+    max-height: calc(100dvh - 24px) !important;
+    padding: 17px 14px !important;
+    border-radius: 20px !important;
+  }
+  #variantChoices {
+    gap: 8px !important;
+  }
+  #variantChoices img {
+    height: 112px !important;
+  }
+  #preorderForm {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  #preorderForm .wide {
+    grid-column: auto !important;
+  }
+  #preorderModal .modalBox {
+    overflow-y: auto !important;
+  }
+  .preProducts {
+    max-height: 220px !important;
+  }
+  #qrFull:not(.hidden) {
+    align-items: center !important;
+    padding: 12px !important;
+    overflow: hidden !important;
+  }
+  #qrFull .qrFullBox {
+    width: min(100%, 360px) !important;
+    max-height: calc(100dvh - 24px) !important;
+    overflow: auto !important;
+    padding: 20px 12px !important;
+    border-radius: 22px !important;
+  }
+  #qrcodeFull img {
+    width: min(72vw, 280px) !important;
+    height: auto !important;
+  }
+  .cashPadHead {
+    text-align: center !important;
+  }
+  .cashPadHead strong {
+    font-size: 31px !important;
+  }
+  .cashPadKeys button {
+    height: 50px !important;
+  }
+  .bestSellerHead {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    padding: 13px !important;
+  }
+  .bestSellerHead > div:nth-child(2) {
+    min-width: 0 !important;
+    flex: 1 1 190px !important;
+  }
+  .bestSellerHead h3 {
+    font-size: 17px !important;
+  }
+  .bestSellerHead .rankTotal {
+    min-width: 72px !important;
+    padding: 6px 8px !important;
+    border-radius: 11px !important;
+  }
+  .bestSellerHead .rankTotal b {
+    font-size: 17px !important;
+  }
+  .productSalesComplete .bestSellerTable {
+    overflow-x: auto !important;
+  }
+  .productSalesComplete .bestSellerRow {
+    min-width: 620px !important;
+  }
+  .docCard630 > main {
+    padding: 12px 8px !important;
+  }
+  .docPaper630 {
+    width: min(80mm, calc(100vw - 28px)) !important;
+    min-height: 0 !important;
+    padding: 6mm 4mm !important;
+  }
+  .summaryBrand .dLogo {
+    flex-basis: 19mm;
+    width: 19mm !important;
+    height: 16mm !important;
+  }
+}
 body {
   margin: 0;
   font-family:
@@ -1025,6 +1234,125 @@ aside h4 {
   @page {
     margin: 3mm;
   }
+}
+
+/* v7.5 warm brown interaction theme */
+:root {
+  --action-brown: #6b4328;
+  --action-brown-dark: #4f2f1e;
+  --action-brown-soft: #f1e4d8;
+}
+button,
+input[type="checkbox"],
+input[type="radio"],
+select {
+  touch-action: manipulation;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--action-brown) !important;
+}
+.method button[data-method="cash"],
+.method button[data-method="qr"],
+#payModal .method button[data-method="cash"],
+#payModal .method button[data-method="qr"] {
+  background: var(--action-brown-soft) !important;
+  border-color: #c9a98f !important;
+  color: var(--action-brown-dark) !important;
+}
+.method button[data-method="cash"] svg,
+.method button[data-method="qr"] svg,
+#payModal .method button[data-method="cash"] svg,
+#payModal .method button[data-method="qr"] svg {
+  color: var(--action-brown) !important;
+  stroke: currentColor !important;
+}
+.method button.active,
+#payModal .method button.active {
+  background: var(--action-brown) !important;
+  border-color: var(--action-brown-dark) !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 3px #6b432833, 0 8px 18px #6b432833 !important;
+}
+.method button.active svg,
+#payModal .method button.active svg {
+  color: #fff !important;
+}
+.close,
+.x,
+.printPreviewClose,
+.docClose630,
+.docCloseBtn630,
+.cashPadClose,
+.reportPaymentDialog header button,
+.posPreview612Card > header button,
+.pinModalClose,
+.staffEditorClose,
+.categoryEditor74 button,
+#cropClose {
+  color: var(--action-brown) !important;
+  background: var(--action-brown-soft) !important;
+  border-color: #c9a98f !important;
+}
+.close:hover,
+.x:hover,
+.printPreviewClose:hover,
+.docClose630:hover,
+.cashPadClose:hover,
+.reportPaymentDialog header button:hover {
+  background: var(--action-brown) !important;
+  color: #fff !important;
+}
+.categoryEditor74 .danger,
+.categoryEditor74 [data-category-delete] {
+  background: #fff !important;
+  color: var(--action-brown) !important;
+  border: 1px solid #c9a98f !important;
+}
+.bestSellerHead .rankTotal {
+  margin-left: auto;
+  min-width: 86px;
+  padding: 8px 12px;
+  border: 1px solid #c9a98f !important;
+  border-radius: 14px;
+  background: #fffaf6 !important;
+  text-align: right !important;
+}
+.bestSellerHead .rankTotal small,
+.bestSellerHead .rankTotal b {
+  color: var(--action-brown-dark) !important;
+}
+.splitTrack {
+  display: flex !important;
+  position: relative !important;
+  min-height: 18px !important;
+  background: #f3e7dd !important;
+  overflow: hidden !important;
+}
+.splitTrack .costSide,
+.splitTrack .costSide.costRed {
+  display: block !important;
+  min-width: 8% !important;
+  background: linear-gradient(90deg, #d96b61, #b63f39) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 2 !important;
+}
+.splitTrack .profitSide,
+.splitTrack .profitSide.profitGreen {
+  display: block !important;
+  background: linear-gradient(90deg, #6ca67c, #34704b) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 1 !important;
+}
+.receipt73 .dLogo,
+.dTicket .dLogo {
+  width: 58mm !important;
+  max-width: 100% !important;
+  height: 32mm !important;
+  max-height: 32mm !important;
+  object-fit: contain !important;
 }
 
 /* v3.2 login refinement */
@@ -16047,4 +16375,143 @@ body.docPreviewOpen {
     background: #fff !important;
     color: #111 !important;
   }
+}
+
+/* v7.6 final overrides: mobile-only modal and print polish */
+.splitProfitCard .splitLabels > div:first-child strong { display:block !important; min-height:1.2em !important; color:#c94e49 !important; opacity:1 !important; visibility:visible !important; }
+.splitTrack .costSide { min-width:8% !important; flex:0 0 auto !important; }
+.splitTrack .profitSide { flex:0 0 auto !important; }
+.summaryTicket { color:#3f2b20; background:linear-gradient(180deg,#fffdf9 0%,#fff8f1 100%); }
+.summaryBrand { display:flex; align-items:center; gap:10px; padding-bottom:10px; border-bottom:1px solid #eadbcd; }
+.summaryBrand .dLogo { flex:0 0 22mm; width:22mm !important; height:18mm !important; margin:0 !important; border:0 !important; background:transparent !important; }
+.summaryBrand h1 { text-align:left; font-size:17px; margin:0; }
+.summaryBrand .dSub { text-align:left; margin:2px 0 0; color:#8c6a53; }
+.summaryDate { margin:10px 0 12px; color:#8c6a53; font-size:10px; text-align:right; }
+.summaryKpis { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:12px; }
+.summaryKpis > div { padding:9px; border:1px solid #eadbcd; border-radius:10px; background:#fff; }
+.summaryKpis span,.summaryKpis b { display:block; }
+.summaryKpis span { color:#8c6a53; font-size:10px; }
+.summaryKpis b { margin-top:3px; font-size:16px; }
+.summarySectionTitle { margin:12px 0 6px; padding-bottom:4px; border-bottom:1px solid #eadbcd; color:#7a4d31; font-size:10px; font-weight:900; letter-spacing:.08em; }
+.summaryRow { margin:6px 0; }
+.summaryRow.cost b { color:#c94e49; }
+.summaryProfit { margin-top:10px; padding:10px 0 0; border-top:2px solid #6b4328; color:#34704b; font-size:17px; }
+.summaryFooter { margin:15px 0 0; color:#8c6a53; font-size:10px; text-align:center; }
+@media (max-width:699px) {
+  #variantModal:not(.hidden),#payModal:not(.hidden),#preorderModal:not(.hidden),#editorModal:not(.hidden),#cashPadModal:not(.hidden) { align-items:center !important; justify-content:center !important; padding:12px !important; }
+  #variantModal .modalBox,#payModal .payBox,#preorderModal .modalBox,#editorModal .modalBox,#cashPadModal .cashPadBox { width:min(100%,430px) !important; max-width:430px !important; max-height:calc(100dvh - 24px) !important; padding:17px 14px !important; border-radius:20px !important; }
+  #variantChoices { gap:8px !important; }
+  #variantChoices img { height:112px !important; }
+  #preorderForm { grid-template-columns:1fr !important; gap:10px !important; }
+  #preorderForm .wide { grid-column:auto !important; }
+  #preorderModal .modalBox { overflow-y:auto !important; }
+  .preProducts { max-height:220px !important; }
+  #qrFull:not(.hidden) { align-items:center !important; padding:12px !important; overflow:hidden !important; }
+  #qrFull .qrFullBox { width:min(100%,360px) !important; max-height:calc(100dvh - 24px) !important; overflow:auto !important; padding:20px 12px !important; border-radius:22px !important; }
+  #qrcodeFull img { width:min(72vw,280px) !important; height:auto !important; }
+  .cashPadHead { text-align:center !important; }
+  .cashPadHead strong { font-size:31px !important; }
+  .cashPadKeys button { height:50px !important; }
+  .bestSellerHead { align-items:flex-start !important; flex-wrap:wrap !important; padding:13px !important; }
+  .bestSellerHead > div:nth-child(2) { min-width:0 !important; flex:1 1 190px !important; }
+  .bestSellerHead h3 { font-size:17px !important; }
+  .bestSellerHead .rankTotal { min-width:72px !important; padding:6px 8px !important; border-radius:11px !important; }
+  .bestSellerHead .rankTotal b { font-size:17px !important; }
+  .productSalesComplete .bestSellerTable { overflow-x:auto !important; }
+  .productSalesComplete .bestSellerRow { min-width:620px !important; }
+  .docCard630 > main { padding:12px 8px !important; }
+  .docPaper630 { width:min(80mm,calc(100vw - 28px)) !important; min-height:0 !important; padding:6mm 4mm !important; }
+  .summaryBrand .dLogo { flex-basis:19mm; width:19mm !important; height:16mm !important; }
+}
+
+/* v7.7 final brown close controls and readable report values */
+button.close,
+button.x,
+button.cashPadClose,
+button.docClose630,
+button.docCloseBtn630,
+button.printPreviewClose,
+button.pinModalClose,
+button.staffEditorClose,
+button[data-close-paydetail],
+button.preConfirmX,
+#cropClose,
+#reportClose,
+.reportPaymentDialog header button,
+.modal .close,
+.modal .x {
+  color: #6b4328 !important;
+  background: #f1e4d8 !important;
+  border-color: #c9a98f !important;
+  -webkit-text-fill-color: #6b4328 !important;
+}
+button.close:hover,
+button.x:hover,
+button.cashPadClose:hover,
+button.docClose630:hover,
+button[data-close-paydetail]:hover,
+.reportPaymentDialog header button:hover {
+  color: #fff !important;
+  background: #6b4328 !important;
+  -webkit-text-fill-color: #fff !important;
+}
+.splitProfitCard .splitLabels > div:first-child,
+.splitProfitCard .splitLabels > div:first-child b,
+.splitProfitCard .splitLabels > div:first-child strong,
+.splitProfitCard .splitLabels > div:first-child em {
+  color: #c94e49 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.bestSellerHead .rankTotal {
+  width: fit-content !important;
+  min-width: 78px !important;
+  max-width: 118px !important;
+  margin-left: auto !important;
+  padding: 7px 10px !important;
+  text-align: right !important;
+}
+.bestSellerHead .rankTotal small,
+.bestSellerHead .rankTotal b {
+  white-space: nowrap !important;
+}
+.costMetric,
+.costMetric b,
+.costMetric strong,
+.costMetric em,
+.costAmountCallout,
+.costAmountCallout span,
+.costAmountCallout strong {
+  color: #b63f39 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.costMetric strong.costAmount {
+  display: block !important;
+  min-height: 28px !important;
+  font-size: 24px !important;
+  line-height: 1.15 !important;
+  font-weight: 950 !important;
+  text-shadow: 0 1px 0 #fff !important;
+}
+.costAmountCallout {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-top: 11px !important;
+  padding: 9px 11px !important;
+  border: 1px solid #e8b8b1 !important;
+  border-radius: 11px !important;
+  background: #fff4f2 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+.costAmountCallout strong {
+  font-size: 18px !important;
+  font-weight: 950 !important;
+  white-space: nowrap !important;
+}
+.costAmountCallout {
+  display: none !important;
 }
