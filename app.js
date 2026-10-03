@@ -348,20 +348,16 @@ const dateKey = (d) => {
 };
 let audioCtx = null,
   speechBusy = false,
-  speechQueue = [],
-  lastClickSoundAt = 0;
+  speechQueue = [];
 function clickSound(freq = 520, dur = 0.045) {
-  if (speechBusy) return;
-  const now = performance.now();
-  if (now - lastClickSoundAt < 28) return;
-  lastClickSoundAt = now;
   try {
     audioCtx =
       audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume?.().catch?.(() => {});
     let o = audioCtx.createOscillator(),
       g = audioCtx.createGain();
     o.frequency.value = freq;
-    g.gain.value = 0.028;
+    g.gain.value = 0.065;
     o.connect(g);
     g.connect(audioCtx.destination);
     o.start();
@@ -422,6 +418,13 @@ function speakLocalized(thText, enText, opts = {}) {
   const en = db.language === "en",
     text = en ? enText || thText : thText;
   if (!text) return;
+  if (opts.interrupt) {
+    try {
+      speechSynthesis.cancel();
+    } catch (e) {}
+    speechBusy = false;
+    speechQueue.length = 0;
+  }
   const item = { text, en };
   if (opts.priority) speechQueue.unshift(item);
   else speechQueue.push(item);
@@ -578,7 +581,10 @@ function go(id) {
   );
   $("#app").classList.toggle("sellMode", id === "sell");
   if (id === "orders") renderOrderTab();
-  if (id === "reports") renderReports();
+  if (id === "reports") {
+    renderReports();
+    speakLocalized("สรุปยอดขายวันนี้", "Today's sales summary.");
+  }
   if (id === "stock") renderStock();
   if (id === "manage") renderManage();
   if (id === "settings") renderSettings();
@@ -866,7 +872,9 @@ function ensureDailyOrder() {
 $("#clear").onclick = () => {
   cart = [];
   renderCart();
-  $("#salePulse").textContent = "ล้างรายการแล้ว";
+  $("#salePulse").textContent =
+    db.language === "en" ? "Order cleared" : "ล้างรายการแล้ว";
+  clickSound(390, 0.055);
 };
 $("#cancelBtn").onclick = () => {
   if (!cart.length) return;
@@ -1064,6 +1072,7 @@ window.completeHeldPreorder = (id) => {
   clickSound(820, 0.1);
   speakLocalized("รายการสั่งล่วงหน้าสำเร็จแล้วค่ะ", "Pre-order completed.", {
     priority: true,
+    interrupt: true,
   });
 };
 window.resumeHeld = (i) => {
@@ -1149,6 +1158,11 @@ function setMethod(m) {
   );
   $("#cashArea").classList.toggle("hidden", m !== "cash");
   $("#qrArea").classList.toggle("hidden", m !== "qr");
+  clickSound(m === "cash" ? 560 : 720, 0.06);
+  speakLocalized(
+    m === "cash" ? "เลือกชำระเงินสดแล้ว" : "เลือกชำระเงินด้วยคิวอาร์แล้ว",
+    m === "cash" ? "Cash payment selected." : "PromptPay QR payment selected.",
+  );
   if (m === "qr") renderQR();
 }
 function renderPayTaxSummary(tc = taxCalc()) {
@@ -1466,6 +1480,10 @@ $("#confirmPay").onclick = () => {
     p.stock = p.fullStock;
     p.halfStock = undefined;
   });
+  pendingStockRedirect = o.items.some((i) => {
+    const p = db.products.find((x) => x.id === i.id);
+    return p && Number(p.fullStock ?? p.stock ?? 0) < 3;
+  });
   save();
   cart = [];
   renderCart();
@@ -1536,15 +1554,15 @@ $("#confirmPay").onclick = () => {
   speakLocalized(
     o.method === "cash"
       ? Math.abs(+o.change) < 0.005
-        ? `${o.total} บาท รับเงินมาพอดีค่ะ`
-        : `${o.total} บาท เงินทอน ${o.change} บาท`
-      : `${o.total} บาท`,
+        ? `ชำระเงินสำเร็จ รับเงิน ${o.total} บาทมาพอดีค่ะ`
+        : `ชำระเงินสำเร็จ ${o.total} บาท เงินทอน ${o.change} บาท`
+      : `ชำระเงินสำเร็จ ${o.total} บาท`,
     o.method === "cash"
       ? Math.abs(+o.change) < 0.005
-        ? `${o.total} baht. Exact amount received.`
-        : `${o.total} baht. Change ${o.change} baht.`
-      : `${o.total} baht.`,
-    { priority: true },
+        ? `Payment successful. Exact amount received: ${o.total} baht.`
+        : `Payment successful. ${o.total} baht received. Change ${o.change} baht.`
+      : `Payment successful. ${o.total} baht received.`,
+    { priority: true, interrupt: true },
   );
 };
 $$("[data-close]").forEach(
@@ -1608,6 +1626,79 @@ function renderOrders() {
     `<div class="emptyState">${en ? "No orders yet" : "ยังไม่มีออเดอร์"}</div>`
   }</div>`;
 }
+function preorderCustomerKey(name, phone) {
+  const digits = String(phone || "").replace(/\D/g, "");
+  return digits || String(name || "").trim().toLowerCase();
+}
+function frequentPreorderCustomers() {
+  const counts = new Map();
+  (db.preorders || []).forEach((p) => {
+    if ((p.status || "pending") === "cancelled") return;
+    const keys = [
+      String(p.customer || "").trim().toLowerCase(),
+      String(p.phone || "").replace(/\D/g, ""),
+    ].filter(Boolean);
+    keys.forEach((key) => counts.set(key, (counts.get(key) || 0) + 1));
+  });
+  return new Set([...counts].filter(([, count]) => count >= 3).map(([key]) => key));
+}
+function savedPreorderCustomers() {
+  const map = new Map();
+  const add = (customer, phone, lastUsedAt = 0) => {
+    const name = String(customer || "").trim();
+    const digits = String(phone || "").replace(/\D/g, "");
+    const key = digits || name.toLowerCase();
+    if (!key) return;
+    const old = map.get(key);
+    if (!old || lastUsedAt >= old.lastUsedAt)
+      map.set(key, { name, phone: digits, lastUsedAt });
+  };
+  (db.preorderCustomers || []).forEach((c) => add(c.name || c.customer, c.phone, c.lastUsedAt || 0));
+  (db.preorders || []).forEach((p) => add(p.customer, p.phone, p.updatedAt || p.createdAt || p.id || 0));
+  return [...map.values()].sort((a, b) => b.lastUsedAt - a.lastUsedAt || a.name.localeCompare(b.name));
+}
+function rememberPreorderCustomer(name, phone) {
+  const customer = String(name || "").trim();
+  const digits = String(phone || "").replace(/\D/g, "");
+  if (!customer && !digits) return;
+  db.preorderCustomers = Array.isArray(db.preorderCustomers) ? db.preorderCustomers : [];
+  const key = digits || customer.toLowerCase();
+  let item = db.preorderCustomers.find((c) => (digits ? String(c.phone || "").replace(/\D/g, "") === digits : !c.phone && String(c.name || "").trim().toLowerCase() === key));
+  if (!item) {
+    item = { name: customer, phone: digits, createdAt: Date.now() };
+    db.preorderCustomers.push(item);
+  } else {
+    item.name = customer || item.name;
+    item.phone = digits || item.phone || "";
+  }
+  item.lastUsedAt = Date.now();
+}
+function openPreorderCustomers() {
+  const en = db.language === "en";
+  document.getElementById("preCustomerPicker74")?.remove();
+  const modal = document.createElement("div");
+  modal.id = "preCustomerPicker74";
+  modal.className = "modal";
+  const customers = savedPreorderCustomers();
+  modal.innerHTML = `<section class="modalBox preCustomerPickerBox"><button class="close" type="button" data-customer-picker-close>×</button><div class="preCustomerPickerHead"><span class="preCustomerPickerIcon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"></circle><path d="M5 20c.8-4 3.2-6 7-6s6.2 2 7 6"></path></svg></span><div><h2>${en ? "Saved customers" : "รายชื่อลูกค้าที่บันทึกไว้"}</h2><p>${en ? "Choose a customer to start another pre-order." : "เลือกลูกค้าเพื่อสร้างรายการสั่งจองใหม่"}</p></div></div><div class="preCustomerPickerList">${customers.length ? customers.map((c) => `<button type="button" class="preCustomerPickerRow" data-customer-key="${escapeHtml(c.phone || c.name)}"><span class="preCustomerAvatar">${escapeHtml((c.name || "?").slice(0, 1).toUpperCase())}</span><span><b>${escapeHtml(c.name || "-")}</b><small>${c.phone ? escapeHtml(c.phone) : en ? "No phone saved" : "ไม่ได้บันทึกเบอร์"}</small></span><strong>›</strong></button>`).join("") : `<div class="preCustomerPickerEmpty">${en ? "No saved customers yet" : "ยังไม่มีรายชื่อลูกค้าที่บันทึกไว้"}</div>`}</div></section>`;
+  document.body.appendChild(modal);
+  updatePageLock();
+  const close = () => { modal.remove(); updatePageLock(); };
+  modal.querySelector("[data-customer-picker-close]").onclick = close;
+  modal.onclick = (e) => { if (e.target === modal) close(); };
+  modal.querySelectorAll("[data-customer-key]").forEach((button) => {
+    button.onclick = () => {
+      const key = button.dataset.customerKey;
+      const customer = customers.find((c) => (c.phone || c.name) === key);
+      close();
+      if (customer) {
+        openPreorder({ customer: customer.name, phone: customer.phone, items: [] });
+        clickSound(760, 0.08);
+        speakLocalized("เลือกลูกค้าแล้ว", "Customer selected.");
+      }
+    };
+  });
+}
 function renderPreorders() {
   let en = db.language === "en";
   const metaIcon = (type) =>
@@ -1624,6 +1715,7 @@ function renderPreorders() {
   window.preorderViewDate = window.preorderViewDate || today;
   window.preorderViewMode = window.preorderViewMode || "date";
   let viewDate = window.preorderViewDate;
+  const frequentCustomers = frequentPreorderCustomers();
   const isOutstanding = window.preorderViewMode === "outstanding";
   let rows = [...db.preorders]
     .filter((p) =>
@@ -1676,7 +1768,18 @@ function renderPreorders() {
         })
         .join("") ||
       `<div class="emptyState">${en ? "No pre-orders for this date" : "ไม่มีรายการสั่งล่วงหน้าในวันที่เลือก"}</div>`
-    }</div>`;
+  }</div>`;
+  const dateFilter = $("#preHistoryDate")?.closest(".preDateFilter");
+  if (dateFilter) {
+    dateFilter.insertAdjacentHTML("afterend", `<button type="button" id="preSavedCustomers" class="preSavedCustomersBtn" title="${en ? "Saved customers" : "รายชื่อลูกค้า"}" aria-label="${en ? "Saved customers" : "รายชื่อลูกค้า"}"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><path d="M3.5 20c.8-3.6 2.7-5.5 5.5-5.5s4.7 1.9 5.5 5.5"></path><path d="M16 11a2.5 2.5 0 1 0 0-5M16 14c2.1 0 3.6 1.4 4.3 4"></path></svg></button>`);
+    $("#preSavedCustomers").onclick = openPreorderCustomers;
+  }
+  $$(".preorderCard .preCustomerLine h3").forEach((h) => {
+    const name = h.textContent.trim();
+    if (frequentCustomers.has(preorderCustomerKey(name, "")) && !h.querySelector(".frequentCustomerStar")) {
+      h.insertAdjacentHTML("afterbegin", '<span class="frequentCustomerStar" title="Frequent customer">★</span>');
+    }
+  });
   $("#newPre").onclick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1777,8 +1880,10 @@ window.completePre = (id) => {
     save();
     renderPreorders();
     renderHeld();
+    clickSound(900, 0.14);
     speakLocalized("รายการสำเร็จแล้วค่ะ", "Order completed.", {
       priority: true,
+      interrupt: true,
     });
   });
 };
@@ -1871,6 +1976,9 @@ function openPreorder(existing = null) {
   $("#preorderModal").classList.remove("hidden");
   syncModalScrollLock();
 }
+$("#prePhone")?.addEventListener("input", (e) => {
+  e.target.value = String(e.target.value || "").replace(/\D/g, "").slice(0, 10);
+});
 window.editPreorder = (id) => {
   const p = db.preorders.find((x) => x.id === id);
   if (!p || ["paid", "completed", "cancelled"].includes(p.status)) return;
@@ -1959,6 +2067,14 @@ function renderPreProducts() {
 
 $("#preorderForm").onsubmit = (e) => {
   e.preventDefault();
+  const phone = String($("#prePhone").value || "").replace(/\D/g, "");
+  if (phone && phone.length !== 10) {
+    return alert(
+      db.language === "en"
+        ? "Phone number must contain exactly 10 digits."
+        : "เบอร์โทรต้องมีตัวเลข 10 หลักเท่านั้นค่ะ",
+    );
+  }
   if (!preCart.length)
     return alert(
       db.language === "en"
@@ -1981,12 +2097,14 @@ $("#preorderForm").onsubmit = (e) => {
     }
     Object.assign(pre, {
       customer: $("#preName").value,
-      phone: $("#prePhone").value,
+      phone,
       date: $("#preDate").value,
       time: $("#preTime").value,
       note: $("#preNote").value,
       items: structuredClone(preCart),
       updatedAt: Date.now(),
+      reminder10At: null,
+      reminder5At: null,
     });
     const held = (db.held || []).find((h) => h.preorderId === pre.id);
     if (held)
@@ -2014,7 +2132,7 @@ $("#preorderForm").onsubmit = (e) => {
       preNo: dailyPreNo,
       orderNo: preOrderNo,
       customer: $("#preName").value,
-      phone: $("#prePhone").value,
+      phone,
       date: $("#preDate").value,
       time: $("#preTime").value,
       note: $("#preNote").value,
@@ -2040,6 +2158,7 @@ $("#preorderForm").onsubmit = (e) => {
       isNewPreorder: true,
     });
   }
+  rememberPreorderCustomer(pre.customer, pre.phone);
   save();
   $("#preorderModal").classList.add("hidden");
   renderPreorders();
@@ -2048,8 +2167,9 @@ $("#preorderForm").onsubmit = (e) => {
   const wasEdit = !!editingPreorderId;
   editingPreorderId = null;
   speakLocalized(
-    wasEdit ? "แก้ไขรายการสั่งล่วงหน้าแล้วค่ะ" : "มีรายการสั่งล่วงหน้าใหม่",
-    wasEdit ? "Pre-order updated." : "A new pre-order has been added.",
+    wasEdit ? "แก้ไขรายการสั่งล่วงหน้าแล้วค่ะ" : "บันทึกออเดอร์สั่งจองล่วงหน้าแล้วค่ะ",
+    wasEdit ? "Pre-order updated." : "Pre-order saved successfully.",
+    { priority: true, interrupt: true },
   );
   $("#salePulse").textContent = wasEdit
     ? db.language === "en"
@@ -2229,6 +2349,21 @@ function renderReports() {
   if (!$("#reportDate").value) $("#reportDate").value = today;
   renderPast();
   bindReportPaymentDetails();
+  syncReportsLanguageLabels();
+}
+
+function syncReportsLanguageLabels() {
+  const en = db.language === "en";
+  const title = document.getElementById("reportSummaryTitle");
+  const subtitle = document.getElementById("reportSummarySubtitle");
+  const print = document.getElementById("printSummary");
+  if (title) title.textContent = en ? "Today's closing summary" : "สรุปปิดยอดวันนี้";
+  if (subtitle)
+    subtitle.textContent = en
+      ? "Sales, cash, QR and order count"
+      : "ยอดขาย เงินสด QR และจำนวนออเดอร์";
+  if (print)
+    print.innerHTML = `<svg><use href="#print"></use></svg><span data-no-translate>${en ? "Print today's summary" : "พิมพ์สรุปยอดวันนี้"}</span>`;
 }
 function renderPast() {
   let key = $("#reportDate").value,
@@ -2352,8 +2487,13 @@ function refreshStock() {
   checkLowStockAlerts();
 }
 window.stockChange = (id, delta) => {
+  clickSound(delta > 0 ? 640 : 420, 0.055);
   adjustStock(id, delta);
   refreshStock();
+  speakLocalized(
+    delta > 0 ? "เพิ่มสต๊อกแล้ว" : "ลดสต๊อกแล้ว",
+    delta > 0 ? "Stock increased." : "Stock decreased.",
+  );
 };
 $("#selectAllStock").onclick = () => {
   const products = visibleStockProducts();
@@ -2371,6 +2511,13 @@ $("#stockCategoryJump").onchange = (e) => {
 function bulk(delta) {
   selectedStock.forEach((id) => adjustStock(id, delta));
   refreshStock();
+  if (selectedStock.size) {
+    clickSound(delta > 0 ? 640 : 420, 0.08);
+    speakLocalized(
+      delta > 0 ? "เพิ่มสต๊อกแล้ว" : "ลดสต๊อกแล้ว",
+      delta > 0 ? "Stock increased." : "Stock decreased.",
+    );
+  }
 }
 $("#bulkPlus").onclick = () => bulk(1);
 $("#bulkMinus").onclick = () => bulk(-1);
@@ -2478,6 +2625,8 @@ function openCategoryEditor(id) {
     }
     category.name = name;
     refresh();
+    clickSound(760, 0.08);
+    speakLocalized("บันทึกหมวดหมู่แล้ว", "Category saved successfully.");
   };
   modal.querySelector("[data-category-delete]").onclick = () => {
     const destination = $("#categoryMove74").value;
@@ -2493,6 +2642,8 @@ function openCategoryEditor(id) {
     if (currentCat === id) currentCat = "all";
     if (stockFilter === id) stockFilter = "all";
     refresh();
+    clickSound(360, 0.08);
+    speakLocalized("ลบหมวดหมู่แล้ว", "Category deleted successfully.");
   };
 }
 window.filterManage = (cat) => renderManageList(cat);
@@ -2538,6 +2689,7 @@ $("#confirmCategory").onclick = () => {
   renderManage();
   renderCats();
   clickSound(720, 0.08);
+  speakLocalized("เพิ่มหมวดหมู่เรียบร้อยแล้ว", "Category added successfully.");
 };
 $("#newCategoryName").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
@@ -2848,6 +3000,7 @@ function saveTaxSettings() {
   b?.classList.add("taxFlash");
   setTimeout(() => b?.classList.remove("taxFlash"), 850);
   clickSound(720, 0.08);
+  speakLocalized("บันทึกการตั้งค่าภาษีแล้ว", "Tax settings saved successfully.");
 }
 function renderSettings() {
   renderShopLogoPreview();
@@ -3070,6 +3223,8 @@ $("#savePrompt").onclick = () => {
       ? "Saved. Dynamic QR updated automatically."
       : "บันทึกแล้ว · QR ไดนามิกอัปเดตอัตโนมัติ",
   );
+  clickSound(760, 0.08);
+  speakLocalized("บันทึกข้อมูลเรียบร้อยแล้ว", "Data saved successfully.");
 };
 $("#removePromptpay")?.addEventListener("click", () => {
   if (!db.promptpay) return;
@@ -3651,7 +3806,8 @@ function removeLogoBackground(file) {
 let successTimer = null,
   successCountdownPaused = false,
   successRemaining = 5,
-  currentSuccessOrderId = null;
+  currentSuccessOrderId = null,
+  pendingStockRedirect = false;
 function closeSuccessAndReset() {
   if (successTimer) {
     clearInterval(successTimer);
@@ -3665,6 +3821,10 @@ function closeSuccessAndReset() {
     db.language === "en" ? "Ready for a new order" : "พร้อมรับออเดอร์ใหม่";
   if (activePreorderPaymentId) {
     activePreorderPaymentId = null;
+  }
+  if (pendingStockRedirect) {
+    pendingStockRedirect = false;
+    go("stock");
   }
 }
 function paintSuccessCountdown() {
@@ -3888,8 +4048,8 @@ function checkCartLowStock(p) {
     save();
     showLowStockToast([p]);
     speakLocalized(
-      "สินค้าใกล้จะหมดแล้ว กรุณาเติมของด้วยค่ะ",
-      "Low stock. Please restock.",
+      "กรุณาเติมของด้วยค่ะ",
+      "Please restock your stock.",
       { priority: true },
     );
     if (remaining <= 0) setTimeout(() => go("stock"), 220);
@@ -3909,15 +4069,15 @@ function checkLowStockAlerts() {
   save();
   clickSound(740, 0.16);
   showLowStockToast(newlyLow);
-  speakLocalized(
-    "สินค้าใกล้จะหมดแล้ว กรุณาเติมของด้วยค่ะ",
-    "Low stock. Please restock.",
-  );
+  speakLocalized("กรุณาเติมของด้วยค่ะ", "Please restock your stock.", {
+    priority: true,
+  });
   if (newlyLow.some((p) => +p.stock <= 0)) setTimeout(() => go("stock"), 220);
 }
 /* ===== v5.50 pre-order due reminder ===== */
 (function () {
-  const LEAD_MINUTES = 30;
+  const REMINDER_10_MINUTES = 10;
+  const REMINDER_5_MINUTES = 5;
   function pickupDate(p) {
     if (!p?.date || !p?.time) return null;
     const d = new Date(`${p.date}T${p.time}:00`);
@@ -3927,6 +4087,7 @@ function checkLowStockAlerts() {
     try {
       audioCtx =
         audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume?.().catch?.(() => {});
       [0, 0.18, 0.36].forEach((delay, i) => {
         const o = audioCtx.createOscillator(),
           g = audioCtx.createGain();
@@ -3943,10 +4104,11 @@ function checkLowStockAlerts() {
       });
     } catch (e) {}
   }
-  function speakReminder(p) {
+  function speakReminder(p, minutes) {
     speakLocalized(
-      `แจ้งเตือนรายการสั่งล่วงหน้า ลูกค้า ${p.customer || ""} เวลารับ ${p.time} นาฬิกา`,
-      `Pre-order reminder. Customer ${p.customer || ""}. Pickup at ${p.time}.`,
+      `แจ้งเตือนออเดอร์ล่วงหน้า ลูกค้า ${p.customer || ""} เหลืออีก ${minutes} นาที จะถึงเวลารับ ${p.time} นาฬิกา`,
+      `Pre-order reminder. Customer ${p.customer || ""}. Pickup is in ${minutes} minutes at ${p.time}.`,
+      { priority: true, interrupt: true },
     );
   }
   function showReminder(p, mins) {
@@ -3963,16 +4125,23 @@ function checkLowStockAlerts() {
     const now = new Date();
     let changed = false;
     (db.preorders || []).forEach((p) => {
-      if (p.remindedAt) return;
+      if (["cancelled", "completed"].includes(p.status)) return;
       const due = pickupDate(p);
       if (!due) return;
       const diff = (due - now) / 60000;
-      if (diff <= LEAD_MINUTES && diff >= -5) {
-        p.remindedAt = Date.now();
+      if (diff <= REMINDER_10_MINUTES && diff > REMINDER_5_MINUTES && !p.reminder10At) {
+        p.reminder10At = Date.now();
         changed = true;
         reminderTone();
-        speakReminder(p);
-        showReminder(p, Math.ceil(diff));
+        speakReminder(p, 10);
+        showReminder(p, 10);
+      }
+      if (diff <= REMINDER_5_MINUTES && diff >= -5 && !p.reminder5At) {
+        p.reminder5At = Date.now();
+        changed = true;
+        reminderTone();
+        speakReminder(p, 5);
+        showReminder(p, 5);
       }
     });
     if (changed) save();
@@ -5295,6 +5464,7 @@ document.addEventListener("click", () => setTimeout(updatePageLock, 0), true);
     const k = dateKey(new Date()),
       s = statsFor(k),
       E = en();
+    speakLocalized("สรุปยอดขายวันนี้", "Today's sales summary.");
     showDocPreview(
       E ? "Today's sales summary" : "สรุปยอดขายวันนี้",
       `<div class="dTicket summaryTicket"><div class="summaryBrand"><img class="dLogo" src="${esc(shopLogoSrc())}" alt=""><div><h1>${esc(db.shopName || "Sourdough")}</h1><p class="dSub">${E ? "TODAY'S SALES SUMMARY" : "สรุปยอดขายวันนี้"}</p></div></div><div class="summaryDate">${esc(k)}</div><div class="summaryKpis"><div><span>${E ? "Total sales" : "ยอดขายรวม"}</span><b>${money(s.sales)}</b></div><div><span>${E ? "Paid orders" : "ออเดอร์ที่ชำระแล้ว"}</span><b>${(s.paid || []).length}</b></div></div><div class="summarySectionTitle">${E ? "PAYMENT BREAKDOWN" : "สรุปช่องทางชำระเงิน"}</div><div class="dRow summaryRow"><span>${E ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b></div><div class="dRow summaryRow"><span>PromptPay</span><b>${money(s.qr)}</b></div><div class="summarySectionTitle">${E ? "PROFIT OVERVIEW" : "ภาพรวมกำไร"}</div><div class="dRow summaryRow cost"><span>${E ? "Cost" : "ต้นทุน"}</span><b>${money(s.cost)}</b></div><div class="dTotal summaryProfit"><span>${E ? "Estimated profit" : "กำไรโดยประมาณ"}</span><b>${money(s.profit)}</b></div><p class="summaryFooter">${E ? "Thank you" : "ขอบคุณที่อุดหนุน"} · ${esc(db.shopName || "Sourdough")}</p></div>`,
@@ -5303,7 +5473,7 @@ document.addEventListener("click", () => setTimeout(updatePageLock, 0), true);
   setTimeout(() => {
     const b = document.getElementById("printSummary");
     if (b) {
-      b.innerHTML = `<svg><use href="#print"></use></svg>${en() ? "Preview today summary" : "ดูสรุปยอดวันนี้"}`;
+      b.innerHTML = `<svg><use href="#print"></use></svg><span data-no-translate>${en() ? "Preview today summary" : "ดูสรุปยอดวันนี้"}</span>`;
       b.onclick = window.openTodaySummaryPreview;
     }
   }, 0);
@@ -5409,6 +5579,7 @@ updatePageLock();
       ชื่อเมนู: "Item",
       ราคา: "Price",
       สรุปปิดยอดวันนี้: "Today’s closing summary",
+      สรุปยอดขายวันนี้: "Today's sales summary",
       "ยอดขาย เงินสด QR และจำนวนออเดอร์": "Sales, payments and order activity",
       พิมพ์สรุปยอดวันนี้: "Print today’s summary",
       เช็กยอดออเดอร์ย้อนหลัง: "Past sales",
@@ -5833,6 +6004,12 @@ updatePageLock();
     };
     renderers[active]?.();
     applyLanguage();
+    if (active === "reports") syncReportsLanguageLabels();
+    speakLocalized(
+      language === "en" ? "เปลี่ยนเป็นภาษาอังกฤษแล้ว" : "เปลี่ยนเป็นภาษาไทยแล้ว",
+      language === "en" ? "English language selected." : "Thai language selected.",
+      { priority: true, interrupt: true },
+    );
   }
   for (const id of ["langTH", "globalLangTH"])
     document

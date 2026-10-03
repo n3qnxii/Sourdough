@@ -404,14 +404,14 @@
           <div class="pagebox">
             <div class="pageHead">
               <div>
-                <h2>สรุปปิดยอดวันนี้</h2>
-                <p>ยอดขาย เงินสด QR และจำนวนออเดอร์</p>
+                <h2 id="reportSummaryTitle" data-no-translate>สรุปปิดยอดวันนี้</h2>
+                <p id="reportSummarySubtitle" data-no-translate>ยอดขาย เงินสด QR และจำนวนออเดอร์</p>
               </div>
               <button class="primary" id="printSummary">
                 <svg>
                   <use href="#print"></use>
                 </svg>
-                พิมพ์สรุปยอดวันนี้
+                <span data-no-translate>พิมพ์สรุปยอดวันนี้</span>
               </button>
             </div>
             <div class="stats" id="todayStats"></div>
@@ -1200,9 +1200,12 @@
               id="prePhone"
               type="tel"
               inputmode="numeric"
-              pattern="[0-9]*"
+              pattern="[0-9]{10}"
+              maxlength="10"
+              minlength="10"
               autocomplete="tel"
             />
+            <small>กรอกตัวเลข 10 หลัก</small>
           </label>
           <label>
             วันที่รับ

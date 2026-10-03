@@ -1,4 +1,4 @@
-const CACHE_NAME = "sourdough-pos-v79";
+const CACHE_NAME = "sourdough-pos-v85";
 
 const APP_SHELL = [
   "./",
