@@ -1215,25 +1215,42 @@ function renderKeypad() {
     modal = $("#cashPadModal"),
     keys = $("#cashPadKeys"),
     en = db.language === "en";
+  // Keep a raw numeric value for the floating keypad.  The main cash field
+  // is formatted as "฿1,000", which must never be used as the keypad's input
+  // string because it would make subsequent digit presses become NaN.
+  let padDigits = String(received || "0").replace(/[^\d]/g, "") || "0";
   $("#quickCash").innerHTML =
     [20, 50, 100, 500, 1000]
       .map((v) => `<button type="button" data-v="${v}">${v}</button>`)
       .join("") +
     `<button type="button" data-exact="1" class="exactCash">${en ? "Exact amount" : "พอดี"}</button>`;
-  $$("#quickCash [data-v]").forEach((b) => {
-    b.onclick = (e) => {
+  // Use pointerdown with a small duplicate-click guard.  On iPad/Safari a
+  // normal click can be delayed after a touch, and the old handler sometimes
+  // received both the touch and synthetic click events.  Handling the first
+  // pointer event makes the keypad feel immediate without double-counting.
+  function bindImmediate(button, action) {
+    let lastPointer = 0;
+    const run = (e) => {
+      const now = performance.now();
+      if (e.type === "click" && now - lastPointer < 450) return;
+      if (e.type === "pointerdown") lastPointer = now;
       e.preventDefault();
       e.stopPropagation();
+      action();
+    };
+    button.addEventListener("pointerdown", run, { passive: false });
+    button.addEventListener("click", run);
+  }
+  $$("#quickCash [data-v]").forEach((b) =>
+    bindImmediate(b, () => {
       setReceived((+received || 0) + (+b.dataset.v || 0));
       clickSound(700, 0.025);
-    };
-  });
-  $("#quickCash [data-exact]").onclick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    }),
+  );
+  bindImmediate($("#quickCash [data-exact]"), () => {
     setReceived(payableTotal());
     clickSound(760, 0.05);
-  };
+  });
   keys.innerHTML = [
     "1",
     "2",
@@ -1250,48 +1267,49 @@ function renderKeypad() {
   ]
     .map(
       (k) =>
-        `<button data-key="${k}" class="${k === "⌫" ? "keyDelete" : k === "ล้าง" ? "keyClear" : ""}">${k}</button>`,
+        `<button type="button" data-key="${k}" class="${k === "⌫" ? "keyDelete" : k === "ล้าง" ? "keyClear" : ""}">${k}</button>`,
     )
     .join("");
   input.value = "";
   function refreshPad() {
-    $("#cashPadValue").textContent = money(+(input.value || 0));
-    setReceived(input.value || 0);
+    padDigits = String(padDigits || "0").replace(/[^\d]/g, "") || "0";
+    $("#cashPadValue").textContent = money(+padDigits);
+    setReceived(padDigits);
   }
   function openPad() {
+    padDigits = String(received || "0").replace(/[^\d]/g, "") || "0";
     modal.classList.remove("hidden");
     syncModalScrollLock();
     refreshPad();
     clickSound(620, 0.04);
   }
-  input.onclick = openPad;
+  bindImmediate(input, openPad);
   input.onfocus = () => input.blur();
-  keys.querySelectorAll("button").forEach(
-    (b) =>
-      (b.onclick = () => {
+  keys.querySelectorAll("button").forEach((b) => {
+    bindImmediate(b, () => {
         let k = b.dataset.key;
-        if (k === "⌫") input.value = input.value.slice(0, -1);
-        else if (k === "ล้าง") input.value = "";
-        else input.value = (input.value === "0" ? "" : input.value) + k;
+        if (k === "⌫") padDigits = padDigits.slice(0, -1) || "0";
+        else if (k === "ล้าง") padDigits = "0";
+        else padDigits = (padDigits === "0" ? "" : padDigits) + k;
         refreshPad();
         clickSound(680, 0.035);
-      }),
-  );
-  $("#cashPadExact").onclick = () => {
-    input.value = payableTotal();
+      });
+  });
+  bindImmediate($("#cashPadExact"), () => {
+    padDigits = String(payableTotal());
     refreshPad();
     clickSound(760, 0.05);
-  };
-  $("#cashPadUse").onclick = () => {
+  });
+  bindImmediate($("#cashPadUse"), () => {
     modal.classList.add("hidden");
     syncModalScrollLock();
     refreshPad();
     clickSound(820, 0.06);
-  };
-  $("#cashPadClose").onclick = () => {
+  });
+  bindImmediate($("#cashPadClose"), () => {
     modal.classList.add("hidden");
     syncModalScrollLock();
-  };
+  });
   modal.onclick = (e) => {
     if (e.target === modal) {
       modal.classList.add("hidden");
