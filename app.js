@@ -1662,11 +1662,12 @@ function frequentPreorderCustomers() {
 }
 function savedPreorderCustomers() {
   const map = new Map();
+  const hidden = new Set((db.deletedPreorderCustomers || []).map(String));
   const add = (customer, phone, lastUsedAt = 0) => {
     const name = String(customer || "").trim();
     const digits = String(phone || "").replace(/\D/g, "");
     const key = digits || name.toLowerCase();
-    if (!key) return;
+    if (!key || hidden.has(key)) return;
     const old = map.get(key);
     if (!old || lastUsedAt >= old.lastUsedAt)
       map.set(key, { name, phone: digits, lastUsedAt });
@@ -1681,6 +1682,9 @@ function rememberPreorderCustomer(name, phone) {
   if (!customer && !digits) return;
   db.preorderCustomers = Array.isArray(db.preorderCustomers) ? db.preorderCustomers : [];
   const key = digits || customer.toLowerCase();
+  db.deletedPreorderCustomers = (db.deletedPreorderCustomers || []).filter(
+    (x) => String(x) !== key,
+  );
   let item = db.preorderCustomers.find((c) => (digits ? String(c.phone || "").replace(/\D/g, "") === digits : !c.phone && String(c.name || "").trim().toLowerCase() === key));
   if (!item) {
     item = { name: customer, phone: digits, createdAt: Date.now() };
@@ -1691,6 +1695,21 @@ function rememberPreorderCustomer(name, phone) {
   }
   item.lastUsedAt = Date.now();
 }
+function deleteSavedPreorderCustomer(customer) {
+  const name = String(customer?.name || "").trim();
+  const phone = String(customer?.phone || "").replace(/\D/g, "");
+  const key = phone || name.toLowerCase();
+  if (!key) return;
+  db.preorderCustomers = (db.preorderCustomers || []).filter((c) => {
+    const cPhone = String(c.phone || "").replace(/\D/g, "");
+    const cKey = cPhone || String(c.name || "").trim().toLowerCase();
+    return cKey !== key;
+  });
+  db.deletedPreorderCustomers = Array.from(
+    new Set([...(db.deletedPreorderCustomers || []), key]),
+  );
+  save();
+}
 function openPreorderCustomers() {
   const en = db.language === "en";
   document.getElementById("preCustomerPicker74")?.remove();
@@ -1700,12 +1719,68 @@ function openPreorderCustomers() {
   const customers = savedPreorderCustomers();
   modal.innerHTML = `<section class="modalBox preCustomerPickerBox"><button class="close" type="button" data-customer-picker-close>×</button><div class="preCustomerPickerHead"><span class="preCustomerPickerIcon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"></circle><path d="M5 20c.8-4 3.2-6 7-6s6.2 2 7 6"></path></svg></span><div><h2>${en ? "Saved customers" : "รายชื่อลูกค้าที่บันทึกไว้"}</h2><p>${en ? "Choose a customer to start another pre-order." : "เลือกลูกค้าเพื่อสร้างรายการสั่งจองใหม่"}</p></div></div><div class="preCustomerPickerList">${customers.length ? customers.map((c) => `<button type="button" class="preCustomerPickerRow" data-customer-key="${escapeHtml(c.phone || c.name)}"><span class="preCustomerAvatar">${escapeHtml((c.name || "?").slice(0, 1).toUpperCase())}</span><span><b>${escapeHtml(c.name || "-")}</b><small>${c.phone ? escapeHtml(c.phone) : en ? "No phone saved" : "ไม่ได้บันทึกเบอร์"}</small></span><strong>›</strong></button>`).join("") : `<div class="preCustomerPickerEmpty">${en ? "No saved customers yet" : "ยังไม่มีรายชื่อลูกค้าที่บันทึกไว้"}</div>`}</div></section>`;
   document.body.appendChild(modal);
+  const pickerHint = modal.querySelector(".preCustomerPickerHead p");
+  if (pickerHint)
+    pickerHint.textContent = en
+      ? "Choose a customer, or press and hold to delete."
+      : "เลือกลูกค้า หรือกดค้างเพื่อลบข้อมูล";
   updatePageLock();
   const close = () => { modal.remove(); updatePageLock(); };
   modal.querySelector("[data-customer-picker-close]").onclick = close;
   modal.onclick = (e) => { if (e.target === modal) close(); };
   modal.querySelectorAll("[data-customer-key]").forEach((button) => {
-    button.onclick = () => {
+    const key = button.dataset.customerKey;
+    const customer = customers.find((c) => (c.phone || c.name) === key);
+    let holdTimer = null,
+      longPressed = false,
+      startX = 0,
+      startY = 0;
+    const clearHold = () => {
+      if (holdTimer) clearTimeout(holdTimer);
+      holdTimer = null;
+    };
+    button.setAttribute(
+      "aria-label",
+      en
+        ? `${customer?.name || "Customer"}. Press and hold to delete.`
+        : `${customer?.name || "ลูกค้า"} กดค้างเพื่อลบ`,
+    );
+    button.addEventListener("pointerdown", (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      longPressed = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      clearHold();
+      holdTimer = setTimeout(() => {
+        longPressed = true;
+        const ok = window.confirm(
+          en
+            ? `Delete saved customer ${customer?.name || ""}?`
+            : `ต้องการลบข้อมูลลูกค้า ${customer?.name || ""} ใช่ไหม?`,
+        );
+        if (!ok) return;
+        deleteSavedPreorderCustomer(customer);
+        close();
+        openPreorderCustomers();
+        clickSound(360, 0.08);
+        speakLocalized("ลบข้อมูลลูกค้าแล้ว", "Saved customer deleted.", {
+          priority: true,
+        });
+      }, 650);
+    });
+    button.addEventListener("pointermove", (e) => {
+      if (Math.hypot(e.clientX - startX, e.clientY - startY) > 12) clearHold();
+    });
+    button.addEventListener("pointerup", clearHold);
+    button.addEventListener("pointercancel", clearHold);
+    button.addEventListener("pointerleave", clearHold);
+    button.onclick = (e) => {
+      if (longPressed) {
+        e.preventDefault();
+        e.stopPropagation();
+        longPressed = false;
+        return;
+      }
       const key = button.dataset.customerKey;
       const customer = customers.find((c) => (c.phone || c.name) === key);
       close();
@@ -2609,7 +2684,7 @@ function openCategoryEditor(id) {
   const modal = document.createElement("div");
   modal.id = "categoryEditor74";
   modal.className = "modal";
-  modal.innerHTML = `<section class="modalBox categoryEditor74"><h2>${en ? "Edit category" : "แก้ไขหมวดหมู่"}</h2><label>${en ? "Category name" : "ชื่อหมวดหมู่"}<input id="categoryRename74" value="${escapeHtml(category.name)}" maxlength="80"></label><p>${en ? "Deleting this category keeps its products and moves them to the category below." : "เมื่อลบหมวดหมู่ สินค้าจะยังอยู่และย้ายไปหมวดหมู่ด้านล่าง"}</p><label>${en ? "Move products to" : "ย้ายสินค้าไปที่"}<select id="categoryMove74">${others.length ? others.map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`).join("") : `<option value="uncategorized">${en ? "Uncategorized" : "ไม่มีหมวดหมู่"}</option>`}</select></label><small>${count} ${en ? "products" : "สินค้า"}</small><div class="categoryError74" role="alert"></div><footer><button data-category-close>${en ? "Cancel" : "ยกเลิก"}</button><button class="danger" data-category-delete>${en ? "Delete category" : "ลบหมวดหมู่"}</button><button class="primary" data-category-save>${en ? "Save" : "บันทึก"}</button></footer></section>`;
+  modal.innerHTML = `<section class="modalBox categoryEditor74"><h2>${en ? "Edit category" : "แก้ไขหมวดหมู่"}</h2><label>${en ? "Category name" : "ชื่อหมวดหมู่"}<input id="categoryRename74" value="${escapeHtml(category.name)}" maxlength="80"></label><p>${en ? "Deleting this category keeps its products and moves them to the category below." : "เมื่อลบหมวดหมู่ สินค้าจะยังอยู่และย้ายไปหมวดหมู่ด้านล่าง"}</p><label>${en ? "Move products to" : "ย้ายสินค้าไปที่"}<select id="categoryMove74">${others.length ? others.map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`).join("") : `<option value="uncategorized">${en ? "Uncategorized" : "ไม่มีหมวดหมู่"}</option>`}</select></label><small>${count} ${en ? "products" : "สินค้า"}</small><div class="categoryError74" role="alert"></div><footer><button type="button" data-category-close>${en ? "Cancel" : "ยกเลิก"}</button><button type="button" class="danger" data-category-delete>${en ? "Delete category" : "ลบหมวดหมู่"}</button><button type="button" class="primary" data-category-save>${en ? "Save" : "บันทึก"}</button></footer></section>`;
   document.body.appendChild(modal);
   updatePageLock();
   const close = () => {
