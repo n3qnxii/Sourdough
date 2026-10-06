@@ -318,7 +318,41 @@ let cart = [],
   received = "0",
   currentOrderTab = "history",
   preCart = [];
-const save = () => localStorage.setItem("sdpos_v32", JSON.stringify(db));
+/* iPad Safari has a small localStorage quota. Keep photos compact and retry
+ * without historical snapshot images if the quota is reached. */
+const save = () => {
+  const key = "sdpos_v32";
+  try {
+    localStorage.setItem(key, JSON.stringify(db));
+    return true;
+  } catch (err) {
+    try {
+      const compact = JSON.parse(JSON.stringify(db));
+      ["orders", "held", "preorders"].forEach((list) => {
+        (compact[list] || []).forEach((row) =>
+          (row.items || []).forEach((item) => {
+            if (item && typeof item.img === "string" && item.img.startsWith("data:")) item.img = "";
+            if (item && typeof item.image === "string" && item.image.startsWith("data:")) item.image = "";
+            if (item && typeof item.halfImg === "string" && item.halfImg.startsWith("data:")) item.halfImg = "";
+          }),
+        );
+      });
+      localStorage.setItem(key, JSON.stringify(compact));
+      db.orders = compact.orders;
+      db.held = compact.held;
+      db.preorders = compact.preorders;
+      return true;
+    } catch (retryErr) {
+      console.warn("POS data could not be saved", retryErr);
+      window.dispatchEvent(new CustomEvent("sdpos-save-error"));
+      return false;
+    }
+  }
+};
+window.addEventListener("sdpos-save-error", () => {
+  const en = db.language === "en";
+  alert(en ? "Storage is full. Remove an unused photo or export a backup, then save again." : "พื้นที่จัดเก็บเต็ม กรุณาลบรูปที่ไม่ใช้หรือสำรองข้อมูล แล้วลองบันทึกอีกครั้ง");
+});
 const total = () => cart.reduce((a, x) => a + x.qty * x.price, 0);
 const qty = () => cart.reduce((a, x) => a + x.qty, 0);
 function taxCalc(subtotal = total(), cfg = db.tax || {}) {
@@ -3799,8 +3833,9 @@ $("#removeQrImage")?.addEventListener("click", () => {
     if (!img || !target) return;
     draw();
     let out = document.createElement("canvas");
-    out.width = 900;
-    out.height = 900;
+    const outputSize = isLogo || isStaff ? 640 : 520;
+    out.width = outputSize;
+    out.height = outputSize;
     let oc = out.getContext("2d");
     if (!isLogo) {
       oc.fillStyle = "#f5eee4";
@@ -3808,14 +3843,14 @@ $("#removeQrImage")?.addEventListener("click", () => {
     }
     if (isLogo) {
       oc.save();
-      shapePath(oc, cropShape, 900);
+      shapePath(oc, cropShape, outputSize);
       oc.clip();
     }
-    oc.drawImage(canvas, 0, 0, 900, 900);
+    oc.drawImage(canvas, 0, 0, outputSize, outputSize);
     if (isLogo) oc.restore();
     let data = out.toDataURL(
       isLogo || isStaff ? "image/png" : "image/jpeg",
-      0.92,
+      isLogo || isStaff ? undefined : 0.76,
     );
     if (isLogo) {
       target.dataset.cropped = data;
@@ -5441,7 +5476,7 @@ document.addEventListener("click", () => setTimeout(updatePageLock, 0), true);
     const x = document.createElement("div");
     x.id = "docPreview630";
     x.className = "docPreview630";
-    x.innerHTML = `<section class="docCard630"><header><div><small>${en() ? "DOCUMENT PREVIEW" : "ตัวอย่างเอกสาร"}</small><h2>${esc(title)}</h2></div><button type="button" class="docClose630">×</button></header><main><div class="docPaper630">${body}</div></main><footer><button type="button" class="docCloseBtn630">${en() ? "Close" : "ปิด"}</button><button type="button" class="docNativePrint631">${en() ? "Print" : "พิมพ์"}</button></footer></section>`;
+    x.innerHTML = `<section class="docCard630"><header><div><small>${en() ? "DOCUMENT PREVIEW" : "ตัวอย่างเอกสาร"}</small><h2>${esc(title)}</h2></div><button type="button" class="docClose630">×</button></header><main><div class="docPaper630">${body}</div></main><footer><button type="button" class="docCloseBtn630">${en() ? "Close" : "ปิด"}</button><button type="button" class="docPdf631">${en() ? "Save PDF / Share" : "บันทึก PDF / แชร์"}</button><button type="button" class="docNativePrint631">${en() ? "Print" : "พิมพ์"}</button></footer></section>`;
     document.body.appendChild(x);
     document.body.classList.add("docPreviewOpen");
     x.querySelector(".docClose630").onclick = closeDocPreview;
@@ -5451,17 +5486,26 @@ document.addEventListener("click", () => setTimeout(updatePageLock, 0), true);
       document.documentElement.classList.add("browserNativePrint631");
       window.print();
     };
+    x.querySelector(".docPdf631").onclick = function () {
+      /* Safari creates the PDF in its native print sheet. Save it to Files,
+       * then use the iPad share sheet to choose Labelife. */
+      document.documentElement.classList.add("browserNativePrint631");
+      window.print();
+    };
     x.onclick = (e) => {
       if (e.target === x) closeDocPreview();
     };
   }
   function items(items, kitchen = false) {
     return (items || [])
-      .map((i) =>
+      .map((i) => {
+        const thaiName = i.thName || i.nameTh || i.localName || "";
+        return (
         kitchen
           ? `<div class="dKitchenItem"><b>${i.qty} × ${esc(i.name)}</b>${i.variant ? `<span>${esc(i.variant)}</span>` : ""}</div>`
-          : `<div class="dRow dItem"><span><b>${i.qty} × ${esc(i.name)}</b>${i.variant ? `<small>${esc(i.variant)}</small>` : ""}</span><b>${money((+i.qty || 0) * (+i.price || 0))}</b></div>`,
-      )
+          : `<div class="dRow dItem"><span class="dItemText"><b class="dItemMain">${i.qty} × ${esc(i.name)}</b>${thaiName && thaiName !== i.name ? `<small class="receiptThaiName">${esc(thaiName)}</small>` : ""}${i.variant ? `<small>${esc(i.variant)}</small>` : ""}</span><b class="dItemPrice">${money((+i.qty || 0) * (+i.price || 0))}</b></div>`
+        );
+      })
       .join("");
   }
   function receiptTax(o) {

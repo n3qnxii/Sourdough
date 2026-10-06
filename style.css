@@ -16311,12 +16311,40 @@ body.docPreviewOpen {
   margin: 5px 0;
 }
 .dItem {
-  padding: 5px 0;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: start !important;
+  padding: 7px 0 !important;
   border-bottom: 1px dotted #bbb;
+}
+.dItem > .dItemText {
+  min-width: 0 !important;
+  display: block !important;
+  overflow-wrap: anywhere !important;
+}
+.dItemMain {
+  display: block !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+}
+.dItemPrice {
+  display: block !important;
+  white-space: nowrap !important;
+  text-align: right !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  padding-left: 8px !important;
 }
 .dItem small {
   display: block;
   color: #555;
+  font-size: 10px;
+  line-height: 1.25;
+}
+.dItem .receiptThaiName {
+  color: #8a6e5a !important;
+  font-size: 10px !important;
 }
 .dTotal {
   display: flex;
@@ -16369,15 +16397,43 @@ body.docPreviewOpen {
 /* v6.31 browser-native print: preview first, then Safari/Chrome owns the print dialog */
 .docCard630 > footer {
   gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.docCard630 > footer button {
+  min-height: 46px;
+  min-width: 120px;
+  padding: 10px 15px;
+  border: 2px solid #c9a98f !important;
+  border-radius: 13px !important;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+.docCard630 > footer button:active {
+  transform: scale(.97);
 }
 .docNativePrint631 {
-  min-width: 125px;
-  padding: 12px 18px;
-  border: 0;
-  border-radius: 12px;
-  background: #3f2b20;
+  min-width: 125px !important;
+  background: #6b4328 !important;
   color: #fff;
-  font-weight: 900;
+  border-color: #6b4328 !important;
+}
+.docPdf631 {
+  background: #f0d2a1 !important;
+  color: #4e2f1d !important;
+  border-color: #b77a32 !important;
+}
+.docCloseBtn630 {
+  background: #fff !important;
+  color: #6b4328 !important;
+}
+@media (max-width: 520px) {
+  .docCard630 > footer button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
 }
 @media print {
   @page {
@@ -16474,6 +16530,119 @@ body.docPreviewOpen {
   .docCard630 > main { padding:12px 8px !important; }
   .docPaper630 { width:min(80mm,calc(100vw - 28px)) !important; min-height:0 !important; padding:6mm 4mm !important; }
   .summaryBrand .dLogo { flex-basis:19mm; width:19mm !important; height:16mm !important; }
+}
+
+/* v8.10 — iPad portrait layout and PDF/Labelife action */
+.docPdf631 {
+  background: #f7eee5 !important;
+  color: #6b4328 !important;
+  border-color: #c9a98f !important;
+}
+.docPdf631:hover {
+  background: #6b4328 !important;
+  color: #fff !important;
+}
+@media (orientation: portrait) and (min-width: 700px) and (max-width: 1100px) {
+  .app {
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+  }
+  .app.sellMode main {
+    margin-left: 0 !important;
+    padding: 12px !important;
+  }
+  .app.sellMode aside {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .topbar {
+    min-height: 64px !important;
+    padding: 10px 14px !important;
+    gap: 10px !important;
+  }
+  .topbar h1, .topbar .storeName {
+    font-size: clamp(16px, 2.2vw, 23px) !important;
+    line-height: 1.15 !important;
+  }
+  .pagebox {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+  .pageHead {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+  }
+  .pageHead > .actions {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .pageHead > .actions button,
+  .pageHead > .actions select {
+    min-width: 0 !important;
+    width: 100% !important;
+    white-space: normal !important;
+  }
+  #sell.active {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  #sell .cartPanel {
+    position: relative !important;
+    top: auto !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  #sell .cartItems {
+    max-height: 34dvh !important;
+    overflow-y: auto !important;
+  }
+  .products {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .product {
+    min-width: 0 !important;
+  }
+  .product .pName,
+  .product .pPrice,
+  .product small,
+  .product span {
+    overflow-wrap: anywhere !important;
+    line-height: 1.25 !important;
+  }
+  #editorModal .modalBox {
+    width: min(700px, calc(100vw - 28px)) !important;
+    max-height: calc(100dvh - 24px) !important;
+    padding: 18px !important;
+  }
+  #editorModal .loafSectionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  #editorModal .editorPhotoTop,
+  #editorModal .halfPhotoEditor {
+    grid-template-columns: minmax(0, 1fr) 150px !important;
+  }
+  #editorModal .editablePreview {
+    width: 150px !important;
+    height: 120px !important;
+  }
+  .settingsGrid,
+  .kitchenGrid {
+    grid-template-columns: 1fr !important;
+  }
+  .settingsCard,
+  .manageRow,
+  .orderCard,
+  .preorderCard {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
 }
 
 /* v7.7 final brown close controls and readable report values */
