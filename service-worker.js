@@ -1,4 +1,4 @@
-const CACHE_NAME = "sourdough-pos-v85";
+const CACHE_NAME = "sourdough-pos-v8-12";
 
 const APP_SHELL = [
   "./",
@@ -6,6 +6,27 @@ const APP_SHELL = [
   "./style.css",
   "./app.js",
   "./manifest.webmanifest",
+  "./login-logo-transparent.png",
+  "./assets/branding/login-bg.png",
+  "./assets/branding/logo.png",
+  "./assets/branding/shop-logo-transparent.png",
+  "./assets/classic.svg",
+  "./assets/wholewheat.svg",
+  "./assets/multigrain.svg",
+  "./assets/sesame.svg",
+  "./assets/cranberry.svg",
+  "./assets/walnut.svg",
+  "./assets/milk.svg",
+  "./assets/wheatbread.svg",
+  "./assets/nosugar.svg",
+  "./assets/brownie.svg",
+  "./assets/buttercookie.svg",
+  "./assets/graincookie.svg",
+  "./assets/fries.svg",
+  "./assets/staff/avatar-owner.svg",
+  "./assets/staff/avatar-staff1.svg",
+  "./assets/staff/avatar-staff2.svg",
+  "./assets/staff/avatar-staff3.svg",
 ];
 
 self.addEventListener("install", (event) => {

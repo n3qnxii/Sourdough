@@ -22,6 +22,11 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   </head>
   <body>
+    <div class="saveErrorBanner hidden" id="saveErrorBanner" role="alert">
+      <strong>🔴 บันทึกไม่สำเร็จ</strong>
+      <span>กรุณาสำรองข้อมูลก่อนดำเนินการต่อ</span>
+      <button type="button" id="saveErrorClose" aria-label="ปิด">×</button>
+    </div>
     <svg class="defs">
       <symbol id="user" viewbox="0 0 24 24">
         <circle cx="12" cy="8" r="4"></circle>
@@ -800,6 +805,22 @@
                   <button class="warm" id="exportCSV">Export CSV</button>
                   <button class="primary" id="exportExcel">Export Excel</button>
                 </div>
+                <section class="storageMonitorCard" aria-live="polite">
+                  <div class="storageMonitorHead">
+                    <div>
+                      <small>พื้นที่จัดเก็บข้อมูล</small>
+                      <strong id="storageStatusText">กำลังตรวจสอบพื้นที่…</strong>
+                    </div>
+                    <span class="storageDot" id="storageStatusDot"></span>
+                  </div>
+                  <div class="storageBar"><i id="storageBarFill"></i></div>
+                  <p id="storageBackupText">ระบบจะสำรองข้อมูลอัตโนมัติทุกครั้งที่บันทึก</p>
+                  <div class="storageActions">
+                    <button class="warm" id="backupNow" type="button">สำรองข้อมูลตอนนี้</button>
+                    <button class="softBtn" id="downloadBackup" type="button">ดาวน์โหลดไฟล์สำรอง</button>
+                  </div>
+                  <small class="storageLastBackup" id="lastBackupText">ยังไม่มีการสำรองข้อมูล</small>
+                </section>
               </div>
             </div>
           </div>

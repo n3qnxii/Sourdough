@@ -231,11 +231,14 @@ let db = JSON.parse(localStorage.getItem("sdpos_v32") || "null") || {
   preorders: old?.preorders || [],
   qrImage: old?.qrImage || "",
   language: old?.language || "th",
+  archivedSummary: old?.archivedSummary || {},
 };
 db.shopName = db.shopName || "Sourdough";
 db.printerWidth = db.printerWidth || 80;
 db.language = db.language || "th";
 db.shopLogo = db.shopLogo || "";
+db.archivedSummary = db.archivedSummary || {};
+db.backupMeta = db.backupMeta || { lastBackupAt: "" };
 db.tax = db.tax || {
   enabled: false,
   rate: 7,
@@ -324,6 +327,7 @@ const save = () => {
   const key = "sdpos_v32";
   try {
     localStorage.setItem(key, JSON.stringify(db));
+    queueIndexedDbBackup();
     return true;
   } catch (err) {
     try {
@@ -341,6 +345,7 @@ const save = () => {
       db.orders = compact.orders;
       db.held = compact.held;
       db.preorders = compact.preorders;
+      queueIndexedDbBackup();
       return true;
     } catch (retryErr) {
       console.warn("POS data could not be saved", retryErr);
@@ -350,9 +355,152 @@ const save = () => {
   }
 };
 window.addEventListener("sdpos-save-error", () => {
-  const en = db.language === "en";
-  alert(en ? "Storage is full. Remove an unused photo or export a backup, then save again." : "พื้นที่จัดเก็บเต็ม กรุณาลบรูปที่ไม่ใช้หรือสำรองข้อมูล แล้วลองบันทึกอีกครั้ง");
+  const en = db.language === "en",
+    banner = document.getElementById("saveErrorBanner");
+  if (banner) {
+    banner.querySelector("strong").textContent = en ? "🔴 Save failed" : "🔴 บันทึกไม่สำเร็จ";
+    banner.querySelector("span").textContent = en ? "Please back up your data before continuing." : "กรุณาสำรองข้อมูลก่อนดำเนินการต่อ";
+    banner.classList.remove("hidden");
+  }
 });
+const BACKUP_DB_NAME = "sourdough-pos-backups-v1";
+const BACKUP_STORE = "snapshots";
+let backupTimer = null;
+function openBackupDb() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) return reject(new Error("IndexedDB unavailable"));
+    const request = indexedDB.open(BACKUP_DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      const store = request.result.createObjectStore(BACKUP_STORE, { keyPath: "id" });
+      store.createIndex("createdAt", "createdAt");
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("IndexedDB error"));
+  });
+}
+async function backupToIndexedDb() {
+  try {
+    const database = await openBackupDb();
+    const snapshot = {
+      id: "latest",
+      createdAt: new Date().toISOString(),
+      payload: JSON.stringify(db),
+    };
+    await new Promise((resolve, reject) => {
+      const tx = database.transaction(BACKUP_STORE, "readwrite");
+      tx.objectStore(BACKUP_STORE).put(snapshot);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error || new Error("Backup failed"));
+    });
+    database.close();
+    db.backupMeta.lastBackupAt = snapshot.createdAt;
+    // Keep the timestamp visible after a refresh without calling save() again
+    // (which would recursively queue another backup).
+    try {
+      localStorage.setItem("sdpos_v32", JSON.stringify(db));
+    } catch (_) {}
+    updateStorageStatus();
+    return true;
+  } catch (err) {
+    console.warn("IndexedDB backup failed", err);
+    return false;
+  }
+}
+function queueIndexedDbBackup() {
+  clearTimeout(backupTimer);
+  backupTimer = setTimeout(() => backupToIndexedDb(), 250);
+}
+function archiveOldOrderDetails() {
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - 12);
+  let changed = false;
+  db.archivedSummary = db.archivedSummary || {};
+  const keep = [];
+  (db.orders || []).forEach((o) => {
+    const when = new Date(o.date || `${o.localDate || ""}T23:59:59`);
+    if (!Number.isNaN(when.getTime()) && when < cutoff) {
+      const key = o.localDate || dateKey(when);
+      const bucket = db.archivedSummary[key] || (db.archivedSummary[key] = { sales: 0, cash: 0, qr: 0, cost: 0, paidOrders: 0, cancelled: 0 });
+      if (o.status === "cancelled") {
+        bucket.cancelled += 1;
+      } else if (o.status === "paid" || o.method === "cash" || o.method === "qr") {
+        bucket.paidOrders += 1;
+        bucket.sales += Number(o.total) || 0;
+        if (o.method === "cash") bucket.cash += Number(o.total) || 0;
+        if (o.method === "qr") bucket.qr += Number(o.total) || 0;
+        bucket.cost += (o.items || []).reduce((sum, i) => {
+          const product = db.products.find((p) => p.id === i.id) || db.products.find((p) => p.name === i.name) || {};
+          const variant = String(i.variant || "").toLowerCase();
+          const savedCost = Number(i.unitCost);
+          const fallback = variant.includes("ครึ่ง") || variant.includes("half")
+            ? Number(product.halfCost) || (Number(product.cost) || 0) / 2
+            : Number(product.cost) || 0;
+          const unitCost = Number.isFinite(savedCost) ? savedCost : fallback;
+          return sum + Math.max(0, unitCost) * Math.max(0, Number(i.qty) || 0);
+        }, 0);
+      }
+      changed = true;
+    } else keep.push(o);
+  });
+  if (changed) {
+    db.orders = keep;
+    save();
+  }
+}
+setTimeout(archiveOldOrderDetails, 700);
+async function readLatestBackup() {
+  const database = await openBackupDb();
+  return await new Promise((resolve, reject) => {
+    const tx = database.transaction(BACKUP_STORE, "readonly");
+    const request = tx.objectStore(BACKUP_STORE).get("latest");
+    request.onsuccess = () => {
+      database.close();
+      resolve(request.result || null);
+    };
+    request.onerror = () => {
+      database.close();
+      reject(request.error);
+    };
+  });
+}
+function downloadCurrentBackup() {
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const blob = new Blob([JSON.stringify({ app: "Sourdough POS", version: "8.12", exportedAt: new Date().toISOString(), data: db }, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url;
+  a.download = `sourdough-pos-backup-${stamp}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+async function updateStorageStatus() {
+  const text = document.getElementById("storageStatusText"),
+    fill = document.getElementById("storageBarFill"),
+    dot = document.getElementById("storageStatusDot"),
+    last = document.getElementById("lastBackupText");
+  if (!text) return;
+  let usage = 0, quota = 0;
+  try {
+    const estimate = await navigator.storage?.estimate?.();
+    usage = Number(estimate?.usage || 0);
+    quota = Number(estimate?.quota || 0);
+  } catch (_) {}
+  const localBytes = new Blob([localStorage.getItem("sdpos_v32") || ""]).size;
+  usage = Math.max(usage, localBytes);
+  quota = quota || 500 * 1024 * 1024;
+  const ratio = Math.min(100, (usage / quota) * 100);
+  const mb = (n) => (n / 1024 / 1024).toFixed(n < 10 * 1024 * 1024 ? 1 : 0);
+  const warning = ratio >= 80;
+  text.textContent = `${db.language === "en" ? "Storage" : "พื้นที่จัดเก็บ"}: ${mb(usage)} MB / ${mb(quota)} MB · ${warning ? (db.language === "en" ? "Nearly full" : "ใกล้เต็ม") : (db.language === "en" ? "Normal" : "ปกติ")}`;
+  dot?.classList.toggle("warning", warning);
+  fill?.style.setProperty("width", `${Math.max(1, ratio)}%`);
+  fill?.classList.toggle("warning", warning);
+  if (last) last.textContent = db.backupMeta?.lastBackupAt ? `${db.language === "en" ? "Last automatic backup" : "สำรองข้อมูลล่าสุด"}: ${new Date(db.backupMeta.lastBackupAt).toLocaleString(db.language === "en" ? "en-AU" : "th-TH")}` : (db.language === "en" ? "No backup yet" : "ยังไม่มีการสำรองข้อมูล");
+}
+window.backupToIndexedDb = backupToIndexedDb;
+setTimeout(() => {
+  updateStorageStatus();
+  queueIndexedDbBackup();
+}, 300);
 const total = () => cart.reduce((a, x) => a + x.qty * x.price, 0);
 const qty = () => cart.reduce((a, x) => a + x.qty, 0);
 function taxCalc(subtotal = total(), cfg = db.tax || {}) {
@@ -797,8 +945,18 @@ function addCart(p, variant, price) {
   else cart.push({ key, id: p.id, name: p.name, variant, price, qty: 1 });
   renderCart();
   renderProducts();
+  // On iPad portrait the cart sits below the menu. Bring the current order
+  // into view immediately after a menu tap so staff can verify the item.
+  if (window.matchMedia?.("(orientation: portrait)").matches) {
+    requestAnimationFrame(() =>
+      $("#sell .cartPanel")?.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+    );
+  }
+  const en = db.language === "en";
   $("#salePulse").innerHTML =
-    `เพิ่ม <b>${p.name}</b> · ในออเดอร์ ${qty()} ชิ้น`;
+    en
+      ? `Added <b>${p.name}</b> · ${qty()} ${qty() === 1 ? "item" : "items"} in Order`
+      : `เพิ่ม <b>${p.name}</b> · ในออเดอร์ ${qty()} ชิ้น`;
   $("#salePulse").classList.add("flash");
   setTimeout(() => $("#salePulse").classList.remove("flash"), 500);
   notifyVariantLowStock(p, v);
@@ -998,10 +1156,10 @@ $("#holdBtn").onclick = () => {
   currentOrderNo = null;
   save();
   renderCart();
-  $("#salePulse").textContent =
-    "พัก Order #" +
-    formatOrderNumber(db.held[db.held.length - 1].orderNo) +
-    " แล้ว";
+  const heldNo = formatOrderNumber(db.held[db.held.length - 1].orderNo);
+  $("#salePulse").textContent = db.language === "en"
+    ? `Order #${heldNo} held successfully`
+    : `พัก Order #${heldNo} แล้ว`;
 };
 function paidPreorderOrder(id) {
   return db.orders.find(
@@ -1150,8 +1308,9 @@ window.resumeHeld = (i) => {
   db.held.splice(i, 1);
   save();
   renderCart();
-  $("#salePulse").textContent =
-    "เรียก Order #" + formatOrderNumber(currentOrderNo) + " กลับมาแล้ว";
+  $("#salePulse").textContent = db.language === "en"
+    ? `Order #${formatOrderNumber(currentOrderNo)} resumed successfully`
+    : `เรียก Order #${formatOrderNumber(currentOrderNo)} กลับมาแล้ว`;
   window.setHeldDrawerState?.(false);
   go("sell");
   requestAnimationFrame(() =>
@@ -2342,7 +2501,8 @@ function statsFor(k) {
       o.status !== "cancelled" &&
       (o.status === "paid" || o.method === "cash" || o.method === "qr"),
   );
-  const cancelled = dayOrders.filter((o) => o.status === "cancelled").length;
+  const archived = db.archivedSummary?.[k] || {};
+  const cancelled = dayOrders.filter((o) => o.status === "cancelled").length + (Number(archived.cancelled) || 0);
   const sales = paid.reduce((sum, o) => sum + (+o.total || 0), 0);
   const cash = paid
     .filter((o) => o.method === "cash")
@@ -2374,20 +2534,23 @@ function statsFor(k) {
     0,
   );
   const safeCost = Number.isFinite(cost) ? Math.max(0, cost) : 0;
-  const profit = sales - safeCost;
+  const archivedSales = Number(archived.sales) || 0;
+  const archivedCost = Number(archived.cost) || 0;
+  const profit = sales - safeCost + archivedSales - archivedCost;
   return {
     paid,
     cancelled,
-    sales,
-    cash,
-    qr,
-    cost: safeCost,
+    paidCount: paid.length + (Number(archived.paidOrders) || 0),
+    sales: sales + archivedSales,
+    cash: cash + (Number(archived.cash) || 0),
+    qr: qr + (Number(archived.qr) || 0),
+    cost: safeCost + archivedCost,
     profit: Number.isFinite(profit) ? profit : 0,
   };
 }
 function statHtml(s) {
   let en = db.language === "en";
-  return `<div><span>${en ? "Total sales" : "ยอดขายรวม"}</span><b>${money(s.sales)}</b></div><div><span>${en ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b></div><div><span>QR</span><b>${money(s.qr)}</b></div><div><span>${en ? "Completed orders" : "ออเดอร์สำเร็จ"}</span><b>${s.paid.length} ${en ? "orders" : "ออเดอร์"}</b></div><div><span>${en ? "Cost" : "ต้นทุน"}</span><b>${money(s.cost)}</b></div><div><span>${en ? "Estimated profit" : "กำไรโดยประมาณ"}</span><b>${money(s.profit)}</b></div><div><span>${en ? "Cancelled" : "ยกเลิก"}</span><b>${s.cancelled} ${en ? "orders" : "ออเดอร์"}</b></div>`;
+  return `<div><span>${en ? "Total sales" : "ยอดขายรวม"}</span><b>${money(s.sales)}</b></div><div><span>${en ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b></div><div><span>QR</span><b>${money(s.qr)}</b></div><div><span>${en ? "Completed orders" : "ออเดอร์สำเร็จ"}</span><b>${s.paidCount ?? s.paid.length} ${en ? "orders" : "ออเดอร์"}</b></div><div><span>${en ? "Cost" : "ต้นทุน"}</span><b>${money(s.cost)}</b></div><div><span>${en ? "Estimated profit" : "กำไรโดยประมาณ"}</span><b>${money(s.profit)}</b></div><div><span>${en ? "Cancelled" : "ยกเลิก"}</span><b>${s.cancelled} ${en ? "orders" : "ออเดอร์"}</b></div>`;
 }
 function todayDashboard(s) {
   let en = db.language === "en";
@@ -2418,7 +2581,7 @@ function todayDashboard(s) {
     !hasCost && s.sales > 0
       ? `<small class="reportCostHint">${en ? "Set product cost to show the cost share" : "ตั้งค่าต้นทุนสินค้าเพื่อแสดงสัดส่วนต้นทุน"}</small>`
       : "";
-  return `<div class="reportHero"><div><span class="reportEyebrow">${en ? "TODAY AT A GLANCE" : "ภาพรวมวันนี้"}</span><h3>${money(s.sales)}</h3><p>${en ? "Total sales today" : "ยอดขายรวมของวันนี้"}</p></div><div class="reportOrderPill"><svg><use href="#ordersIcon"/></svg><b>${s.paid.length}</b><span>${en ? "completed" : "สำเร็จ"}</span></div></div><div class="reportMiniGrid"><button type="button" class="metricMotion reportPayDrill" data-pay-detail="cash"><svg><use href="#wallet"/></svg><span>${en ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b><small>${en ? "View payments" : "ดูรายการ"}</small></button><button type="button" class="metricMotion delay1 reportPayDrill" data-pay-detail="qr"><svg><use href="#qr"/></svg><span>PromptPay QR</span><b>${money(s.qr)}</b><small>${en ? "View payments" : "ดูรายการ"}</small></button><div class="metricMotion delay2"><svg><use href="#cancelDoc"/></svg><span>${en ? "Cancelled" : "ยกเลิก"}</span><b>${s.cancelled}</b></div></div><div class="profitCard splitProfitCard"><div class="profitHead"><div><span>${en ? "PROFIT & COST" : "กำไรและต้นทุน"}</span><h3>${en ? "Today’s balance" : "สมดุลของวันนี้"}</h3></div><span class="profitMood ${profitWins ? "good" : "warn"}">${profitWins ? (en ? "Profit leads" : "กำไรมากกว่า") : en ? "Cost leads" : "ต้นทุนมากกว่า"}</span></div><div class="splitLabels"><div class="${profitWins ? "loser" : "winner"}"><b>${en ? "Cost" : "ต้นทุน"}</b><strong>${money(cost)}</strong><em>${costPct.toFixed(1)}%</em></div><div class="${profitWins ? "winner" : "loser"} right"><b>${en ? "Profit" : "กำไร"}</b><strong>${money(profit)}</strong><em>${profitPct.toFixed(1)}%</em></div></div><div class="splitTrack"><i class="costSide ${profitWins ? "low" : "high"}" style="width:${costTrackPct}%"></i><i class="profitSide ${profitWins ? "high" : "low"}" style="width:${profitTrackPct}%"></i><span class="splitCenter"></span></div>${costHint}</div>`;
+  return `<div class="reportHero"><div><span class="reportEyebrow">${en ? "TODAY AT A GLANCE" : "ภาพรวมวันนี้"}</span><h3>${money(s.sales)}</h3><p>${en ? "Total sales today" : "ยอดขายรวมของวันนี้"}</p></div><div class="reportOrderPill"><svg><use href="#ordersIcon"/></svg><b>${s.paidCount ?? s.paid.length}</b><span>${en ? "completed" : "สำเร็จ"}</span></div></div><div class="reportMiniGrid"><button type="button" class="metricMotion reportPayDrill" data-pay-detail="cash"><svg><use href="#wallet"/></svg><span>${en ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b><small>${en ? "View payments" : "ดูรายการ"}</small></button><button type="button" class="metricMotion delay1 reportPayDrill" data-pay-detail="qr"><svg><use href="#qr"/></svg><span>PromptPay QR</span><b>${money(s.qr)}</b><small>${en ? "View payments" : "ดูรายการ"}</small></button><div class="metricMotion delay2"><svg><use href="#cancelDoc"/></svg><span>${en ? "Cancelled" : "ยกเลิก"}</span><b>${s.cancelled}</b></div></div><div class="profitCard splitProfitCard"><div class="profitHead"><div><span>${en ? "PROFIT & COST" : "กำไรและต้นทุน"}</span><h3>${en ? "Today’s balance" : "สมดุลของวันนี้"}</h3></div><span class="profitMood ${profitWins ? "good" : "warn"}">${profitWins ? (en ? "Profit leads" : "กำไรมากกว่า") : en ? "Cost leads" : "ต้นทุนมากกว่า"}</span></div><div class="splitLabels"><div class="${profitWins ? "loser" : "winner"}"><b>${en ? "Cost" : "ต้นทุน"}</b><strong>${money(cost)}</strong><em>${costPct.toFixed(1)}%</em></div><div class="${profitWins ? "winner" : "loser"} right"><b>${en ? "Profit" : "กำไร"}</b><strong>${money(profit)}</strong><em>${profitPct.toFixed(1)}%</em></div></div><div class="splitTrack"><i class="costSide ${profitWins ? "low" : "high"}" style="width:${costTrackPct}%"></i><i class="profitSide ${profitWins ? "high" : "low"}" style="width:${profitTrackPct}%"></i><span class="splitCenter"></span></div>${costHint}</div>`;
 }
 function showReportPaymentDetails(method, key) {
   const en = db.language === "en",
@@ -3618,6 +3781,28 @@ $("#removeQrImage")?.addEventListener("click", () => {
   };
   $("#exportDate").value = dateKey(new Date());
   syncExportMode();
+})();
+
+/* v8.12 — automatic IndexedDB backup and visible storage controls */
+(function () {
+  const close = $("#saveErrorClose");
+  close?.addEventListener("click", () => $("#saveErrorBanner")?.classList.add("hidden"));
+  $("#backupNow")?.addEventListener("click", async () => {
+    const ok = await backupToIndexedDb();
+    if (ok) {
+      clickSound(820, 0.08);
+      speakLocalized("สำรองข้อมูลเรียบร้อยแล้ว", "Backup completed successfully.", { priority: true });
+      updateStorageStatus();
+    } else {
+      window.dispatchEvent(new CustomEvent("sdpos-save-error"));
+    }
+  });
+  $("#downloadBackup")?.addEventListener("click", () => {
+    downloadCurrentBackup();
+    clickSound(760, 0.08);
+    speakLocalized("ดาวน์โหลดไฟล์สำรองแล้ว", "Backup file downloaded.");
+  });
+  updateStorageStatus();
 })();
 
 /* direct image crop: drag the picture itself; wheel/pinch to zoom */
@@ -5604,7 +5789,7 @@ document.addEventListener("click", () => setTimeout(updatePageLock, 0), true);
     speakLocalized("สรุปยอดขายวันนี้", "Today's sales summary.");
     showDocPreview(
       E ? "Today's sales summary" : "สรุปยอดขายวันนี้",
-      `<div class="dTicket summaryTicket"><div class="summaryBrand"><img class="dLogo" src="${esc(shopLogoSrc())}" alt=""><div><h1>${esc(db.shopName || "Sourdough")}</h1><p class="dSub">${E ? "TODAY'S SALES SUMMARY" : "สรุปยอดขายวันนี้"}</p></div></div><div class="summaryDate">${esc(k)}</div><div class="summaryKpis"><div><span>${E ? "Total sales" : "ยอดขายรวม"}</span><b>${money(s.sales)}</b></div><div><span>${E ? "Paid orders" : "ออเดอร์ที่ชำระแล้ว"}</span><b>${(s.paid || []).length}</b></div></div><div class="summarySectionTitle">${E ? "PAYMENT BREAKDOWN" : "สรุปช่องทางชำระเงิน"}</div><div class="dRow summaryRow"><span>${E ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b></div><div class="dRow summaryRow"><span>PromptPay</span><b>${money(s.qr)}</b></div><div class="summarySectionTitle">${E ? "PROFIT OVERVIEW" : "ภาพรวมกำไร"}</div><div class="dRow summaryRow cost"><span>${E ? "Cost" : "ต้นทุน"}</span><b>${money(s.cost)}</b></div><div class="dTotal summaryProfit"><span>${E ? "Estimated profit" : "กำไรโดยประมาณ"}</span><b>${money(s.profit)}</b></div><p class="summaryFooter">${E ? "Thank you" : "ขอบคุณที่อุดหนุน"} · ${esc(db.shopName || "Sourdough")}</p></div>`,
+      `<div class="dTicket summaryTicket"><div class="summaryBrand"><img class="dLogo" src="${esc(shopLogoSrc())}" alt=""><div><h1>${esc(db.shopName || "Sourdough")}</h1><p class="dSub">${E ? "TODAY'S SALES SUMMARY" : "สรุปยอดขายวันนี้"}</p></div></div><div class="summaryDate">${esc(k)}</div><div class="summaryKpis"><div><span>${E ? "Total sales" : "ยอดขายรวม"}</span><b>${money(s.sales)}</b></div><div><span>${E ? "Paid orders" : "ออเดอร์ที่ชำระแล้ว"}</span><b>${s.paidCount ?? (s.paid || []).length}</b></div></div><div class="summarySectionTitle">${E ? "PAYMENT BREAKDOWN" : "สรุปช่องทางชำระเงิน"}</div><div class="dRow summaryRow"><span>${E ? "Cash" : "เงินสด"}</span><b>${money(s.cash)}</b></div><div class="dRow summaryRow"><span>PromptPay</span><b>${money(s.qr)}</b></div><div class="summarySectionTitle">${E ? "PROFIT OVERVIEW" : "ภาพรวมกำไร"}</div><div class="dRow summaryRow cost"><span>${E ? "Cost" : "ต้นทุน"}</span><b>${money(s.cost)}</b></div><div class="dTotal summaryProfit"><span>${E ? "Estimated profit" : "กำไรโดยประมาณ"}</span><b>${money(s.profit)}</b></div><p class="summaryFooter">${E ? "Thank you" : "ขอบคุณที่อุดหนุน"} · ${esc(db.shopName || "Sourdough")}</p></div>`,
     );
   };
   setTimeout(() => {
@@ -5952,6 +6137,11 @@ updatePageLock();
       บวกเพิ่ม: "added",
       รวมในราคา: "included",
       พร้อมรับออเดอร์ใหม่: "Ready for a new order",
+      เพิ่ม: "Added",
+      "ในออเดอร์": "in Order",
+      "พัก Order": "Hold Order",
+      "เรียก Order": "Resume Order",
+      "กลับมาแล้ว": "resumed successfully",
     },
   };
   const extra = {
