@@ -354,6 +354,60 @@ const save = () => {
     }
   }
 };
+
+/* Keep menu photos small enough for iPad Safari storage. Images still render
+ * at the same UI size; only the stored data is reduced. */
+function compressImageDataUrl(data, maxEdge = 420, quality = 0.64) {
+  return new Promise((resolve) => {
+    if (!data || !String(data).startsWith("data:image/")) return resolve(data);
+    const image = new Image();
+    image.onload = () => {
+      const width = image.naturalWidth || image.width;
+      const height = image.naturalHeight || image.height;
+      const scale = Math.min(1, maxEdge / Math.max(width, height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(width * scale));
+      canvas.height = Math.max(1, Math.round(height * scale));
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    image.onerror = () => resolve(data);
+    image.src = data;
+  });
+}
+
+/* One-time migration for photos created by older builds. Older versions could
+ * leave 1–3 MB data URLs in each product, which filled iPad Safari storage and
+ * made the next save fail. Convert those existing photos as soon as the app
+ * starts, without changing the product or its image appearance. */
+async function normalizeStoredProductImages() {
+  let changed = false;
+  for (const product of db.products || []) {
+    for (const key of ["img", "halfImg"]) {
+      const value = product[key];
+      if (typeof value !== "string" || !value.startsWith("data:image/")) continue;
+      const compact = await compressImageDataUrl(value, 360, 0.64);
+      if (compact && compact !== value) {
+        product[key] = compact;
+        changed = true;
+      }
+    }
+  }
+  if (!changed) return;
+  try {
+    localStorage.setItem("sdpos_v32", JSON.stringify(db));
+    queueIndexedDbBackup();
+    renderManageList?.("all");
+    renderProducts?.();
+  } catch (err) {
+    console.warn("Stored product photo migration could not be saved", err);
+    window.dispatchEvent(new CustomEvent("sdpos-save-error"));
+  }
+}
+setTimeout(() => normalizeStoredProductImages(), 0);
 window.addEventListener("sdpos-save-error", () => {
   const en = db.language === "en",
     banner = document.getElementById("saveErrorBanner");
@@ -3128,7 +3182,7 @@ $("#productForm").onsubmit = (e) => {
     new Promise((r) => {
       if (!f) return r(null);
       let x = new FileReader();
-      x.onload = () => r(x.result);
+      x.onload = async () => r(await compressImageDataUrl(x.result, 360, 0.64));
       x.readAsDataURL(f);
     });
   Promise.all([read(file), read(halfFile)]).then(([a, b]) =>
@@ -4018,7 +4072,7 @@ $("#removeQrImage")?.addEventListener("click", () => {
     if (!img || !target) return;
     draw();
     let out = document.createElement("canvas");
-    const outputSize = isLogo || isStaff ? 640 : 520;
+    const outputSize = isLogo || isStaff ? 480 : 360;
     out.width = outputSize;
     out.height = outputSize;
     let oc = out.getContext("2d");
@@ -4035,7 +4089,7 @@ $("#removeQrImage")?.addEventListener("click", () => {
     if (isLogo) oc.restore();
     let data = out.toDataURL(
       isLogo || isStaff ? "image/png" : "image/jpeg",
-      isLogo || isStaff ? undefined : 0.76,
+      isLogo || isStaff ? undefined : 0.64,
     );
     if (isLogo) {
       target.dataset.cropped = data;
