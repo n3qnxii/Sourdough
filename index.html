@@ -505,6 +505,11 @@
                 <b> ภาษี </b>
                 <span> VAT และรูปแบบการคิดภาษี </span>
               </button>
+              <button type="button" id="resetOrderNumberBtn" onclick="resetDailyOrderNumber()">
+                <span class="settingsIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/><path d="M12 7v5l3 2"/></svg></span>
+                <b data-no-translate>รีเซตเลขออเดอร์</b>
+                <span class="resetOrderHint" data-no-translate>เริ่มเลขออเดอร์ใหม่ที่ 001</span>
+              </button>
               <button data-settings="backup">
                 <span class="settingsIcon">
                   <svg>
@@ -982,7 +987,7 @@
           <div>
             <b>
               กลับหน้าขายใน
-              <span id="successSeconds"> 5 </span>
+              <span id="successSeconds"> 15 </span>
               วินาที
             </b>
             <small> แตะ “เริ่มออเดอร์ใหม่” เพื่อกลับทันที </small>
@@ -998,7 +1003,7 @@
                 r="18"
               ></circle>
             </svg>
-            <strong id="ringSeconds"> 5 </strong>
+            <strong id="ringSeconds"> 15 </strong>
           </div>
         </div>
         <div class="successNoteBox">

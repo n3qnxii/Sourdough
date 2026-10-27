@@ -1083,8 +1083,83 @@ function orderSequence(id) {
   return n >= 2000010100001 && n < 3000010100000 ? n % 100000 : n;
 }
 function formatOrderNumber(id) {
-  return String(orderSequence(id)).padStart(3, "0");
+  const n = Number(id) || 0;
+  const sequence = orderSequence(n);
+  const datePrefix = n >= 2000010100001 && n < 3000010100000 ? Math.floor(n / 100000) : null;
+  const markers = (db.orderNumberResets || []).filter((r) => r.datePrefix === datePrefix && sequence >= r.startSequence);
+  const start = markers.length ? markers[markers.length - 1].startSequence : 1;
+  return String(sequence - start + 1).padStart(3, "0");
 }
+// Reset only the displayed daily queue; never reuse internal IDs or erase sales/history.
+function updateResetOrderButtonLanguage() {
+  const btn = document.getElementById("resetOrderNumberBtn");
+  if (!btn) return;
+  const en = db.language === "en";
+  const title = btn.querySelector("b");
+  const subtitle = btn.querySelector("span.resetOrderHint");
+  if (title) title.textContent = en ? "Reset Order Number" : "รีเซตเลขออเดอร์";
+  if (subtitle) subtitle.textContent = en ? "Restart numbering from 001" : "เริ่มเลขออเดอร์ใหม่ที่ 001";
+}
+function showResetOrderDialog({success = false} = {}) {
+  document.getElementById("resetOrderDialog")?.remove();
+  const en = db.language === "en";
+  const overlay = document.createElement("div");
+  overlay.id = "resetOrderDialog";
+  overlay.className = "resetOrderOverlay";
+  overlay.setAttribute("role", "presentation");
+  const dialog = document.createElement("div");
+  dialog.className = "resetOrderModal";
+  dialog.setAttribute("role", success ? "status" : "alertdialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-labelledby", "resetOrderHeading");
+  dialog.setAttribute("data-no-translate", "");
+  const heading = document.createElement("h3");
+  heading.id = "resetOrderHeading";
+  heading.textContent = success ? (en ? "Order Number Reset Successfully!" : "รีเซตเลขออเดอร์สำเร็จ!") : (en ? "Confirm Order Number Reset" : "ยืนยันการรีเซตเลขออเดอร์");
+  const message = document.createElement("p");
+  message.textContent = success ? (en ? "The next order starts at 001. Your previous orders and sales are safe." : "ออเดอร์ใหม่จะเริ่มที่ 001 ข้อมูลออเดอร์และยอดขายเดิมยังอยู่ครบ") : (en ? "Are you sure you want to restart order numbering from 001? Existing orders and sales will not be deleted." : "ต้องการรีเซตเลขออเดอร์ให้เริ่มต้นที่ 001 ใช่หรือไม่? ออเดอร์และยอดขายเดิมจะไม่ถูกลบ");
+  const actions = document.createElement("div");
+  actions.className = "resetOrderModalActions";
+  const close = () => overlay.remove();
+  function addButton(label, primary, handler) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = primary ? "resetOrderPrimary" : "resetOrderSecondary";
+    button.textContent = label;
+    button.addEventListener("click", handler);
+    actions.appendChild(button);
+    return button;
+  }
+  if (success) {
+    addButton(en ? "OK" : "ตกลง", true, close);
+  } else {
+    addButton(en ? "Cancel" : "ยกเลิก", false, close);
+    addButton(en ? "Confirm Reset" : "ยืนยันรีเซต", true, () => {
+      const firstId = nextId();
+      const prefix = dailyOrderPrefix();
+      const marker = {datePrefix: prefix / 100000, startSequence: orderSequence(firstId)};
+      db.orderNumberResets = (db.orderNumberResets || []).filter((r) =>
+        !(r.datePrefix === marker.datePrefix && r.startSequence === marker.startSequence));
+      db.orderNumberResets.push(marker);
+      currentOrderNo = firstId;
+      save();
+      renderCart();
+      close();
+      showResetOrderDialog({success: true});
+      speakLocalized("รีเซตเลขออเดอร์สำเร็จ เริ่มต้นออเดอร์ใหม่ที่ศูนย์ศูนย์หนึ่ง", "Order number reset successfully. Your next order starts at zero zero one.", {interrupt:true,priority:true});
+    });
+  }
+  dialog.append(heading, message, actions);
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+  const keyHandler = (e) => { if (e.key === "Escape") {close();document.removeEventListener("keydown", keyHandler);} };
+  document.addEventListener("keydown", keyHandler, {once:false});
+  actions.querySelector(success ? ".resetOrderPrimary" : ".resetOrderSecondary")?.focus();
+  if (!success) speakLocalized("โปรดยืนยันการรีเซตเลขออเดอร์ เริ่มต้นใหม่ที่ศูนย์ศูนย์หนึ่ง", "Please confirm resetting the order number. The next order will start at zero zero one.", {interrupt:true,priority:true});
+}
+window.resetDailyOrderNumber = function () { showResetOrderDialog(); };
+
 function dailyOrderPrefix() {
   return Number(dateKey(new Date()).replaceAll("-", "")) * 100000;
 }
@@ -4169,10 +4244,11 @@ function removeLogoBackground(file) {
   });
 }
 
-// V4.2: auto-close payment success screen after 5 seconds with animated countdown
+// Auto-close payment success screen after 15 seconds with animated countdown
+const SUCCESS_COUNTDOWN_SECONDS = 15;
 let successTimer = null,
   successCountdownPaused = false,
-  successRemaining = 5,
+  successRemaining = SUCCESS_COUNTDOWN_SECONDS,
   currentSuccessOrderId = null,
   pendingStockRedirect = false;
 function closeSuccessAndReset() {
@@ -4181,7 +4257,7 @@ function closeSuccessAndReset() {
     successTimer = null;
   }
   successCountdownPaused = false;
-  successRemaining = 5;
+  successRemaining = SUCCESS_COUNTDOWN_SECONDS;
   currentSuccessOrderId = null;
   $("#successModal").classList.add("hidden");
   $("#salePulse").textContent =
@@ -4203,7 +4279,7 @@ function paintSuccessCountdown() {
   if (ringSec)
     ringSec.textContent = successCountdownPaused ? "Ⅱ" : successRemaining;
   if (ring)
-    ring.style.strokeDashoffset = String(c * (1 - successRemaining / 5));
+    ring.style.strokeDashoffset = String(c * (1 - successRemaining / SUCCESS_COUNTDOWN_SECONDS));
 }
 function pauseSuccessCountdown() {
   successCountdownPaused = true;
@@ -4215,7 +4291,7 @@ function resumeSuccessCountdown() {
 }
 function startSuccessCountdown() {
   if (successTimer) clearInterval(successTimer);
-  successRemaining = 5;
+  successRemaining = SUCCESS_COUNTDOWN_SECONDS;
   successCountdownPaused = false;
   paintSuccessCountdown();
   successTimer = setInterval(() => {
@@ -6329,6 +6405,7 @@ updatePageLock();
   });
   function applyLanguage() {
     observer.disconnect();
+    updateResetOrderButtonLanguage();
     const walker = document.createTreeWalker(
       document.body,
       NodeFilter.SHOW_TEXT,

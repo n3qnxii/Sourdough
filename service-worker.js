@@ -1,4 +1,4 @@
-const CACHE_NAME = "sourdough-pos-v8-12";
+const CACHE_NAME = "sourdough-pos-v8-14-reset-voice";
 
 const APP_SHELL = [
   "./",
