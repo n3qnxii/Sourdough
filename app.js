@@ -218,7 +218,7 @@ baseProducts.forEach((p) => {
   if (p.prep === undefined) p.prep = p.desc || "";
   if (p.enabled === undefined) p.enabled = true;
 });
-let db = JSON.parse(localStorage.getItem("sdpos_v32") || "null") || {
+let db = window.__sdposHydratedData || JSON.parse(localStorage.getItem("sdpos_v32") || "null") || {
   ...old,
   accounts: old?.accounts || baseAccounts,
   categories: old?.categories || baseCats,
@@ -312,7 +312,8 @@ setTimeout(syncHeaderBrand, 0);
 // V5.0 migration: older builds could save an empty product list. Seed the real shop menu only when there are no products, without overwriting an existing/custom menu.
 if (!db.products.length) {
   db.products = structuredClone(defaultProducts);
-  localStorage.setItem("sdpos_v32", JSON.stringify(db));
+  if (window.SDPhotoStorage) window.SDPhotoStorage.persist(db);
+  else localStorage.setItem("sdpos_v32", JSON.stringify(db));
 }
 let cart = [],
   currentUser = null,
@@ -321,37 +322,16 @@ let cart = [],
   received = "0",
   currentOrderTab = "history",
   preCart = [];
-/* iPad Safari has a small localStorage quota. Keep photos compact and retry
- * without historical snapshot images if the quota is reached. */
+/* Store the complete POS state (including all menu and half-loaf images)
+ * in IndexedDB. This bypasses localStorage's small base64 image quota. */
 const save = () => {
-  const key = "sdpos_v32";
+  if (window.SDPhotoStorage) return window.SDPhotoStorage.persist(db);
   try {
-    localStorage.setItem(key, JSON.stringify(db));
-    queueIndexedDbBackup();
+    localStorage.setItem("sdpos_v32", JSON.stringify(db));
     return true;
   } catch (err) {
-    try {
-      const compact = JSON.parse(JSON.stringify(db));
-      ["orders", "held", "preorders"].forEach((list) => {
-        (compact[list] || []).forEach((row) =>
-          (row.items || []).forEach((item) => {
-            if (item && typeof item.img === "string" && item.img.startsWith("data:")) item.img = "";
-            if (item && typeof item.image === "string" && item.image.startsWith("data:")) item.image = "";
-            if (item && typeof item.halfImg === "string" && item.halfImg.startsWith("data:")) item.halfImg = "";
-          }),
-        );
-      });
-      localStorage.setItem(key, JSON.stringify(compact));
-      db.orders = compact.orders;
-      db.held = compact.held;
-      db.preorders = compact.preorders;
-      queueIndexedDbBackup();
-      return true;
-    } catch (retryErr) {
-      console.warn("POS data could not be saved", retryErr);
-      window.dispatchEvent(new CustomEvent("sdpos-save-error"));
-      return false;
-    }
+    window.dispatchEvent(new CustomEvent("sdpos-save-error"));
+    return false;
   }
 };
 
@@ -398,7 +378,7 @@ async function normalizeStoredProductImages() {
   }
   if (!changed) return;
   try {
-    localStorage.setItem("sdpos_v32", JSON.stringify(db));
+    save();
     queueIndexedDbBackup();
     renderManageList?.("all");
     renderProducts?.();
@@ -451,7 +431,7 @@ async function backupToIndexedDb() {
     // Keep the timestamp visible after a refresh without calling save() again
     // (which would recursively queue another backup).
     try {
-      localStorage.setItem("sdpos_v32", JSON.stringify(db));
+      localStorage.setItem("sdpos_v32", JSON.stringify(window.SDPhotoStorage?.compactCopy(db) || db));
     } catch (_) {}
     updateStorageStatus();
     return true;
@@ -5676,9 +5656,9 @@ window.kitchenSelect = function (id) {
     bindPrePhoneNumeric();
   };
   window.openPreorder = openPreorder;
-  document.addEventListener("DOMContentLoaded", bindPrePhoneNumeric, {
-    once: true,
-  });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindPrePhoneNumeric, { once: true });
+  } else bindPrePhoneNumeric();
 
   // Kitchen: completed orders keep their frozen timer, but no redundant "Completed" status badge/final label.
   const _renderKitchenV591 = renderKitchen;
@@ -6285,6 +6265,21 @@ updatePageLock();
       "QR preview · the checkout QR is generated for the actual amount",
     "ยังไม่ได้ตั้งค่า PromptPay": "PromptPay has not been set up",
     เลือกวัน: "Select date",
+    "สำรองข้อมูลยอดขาย": "Sales data backup",
+    "ส่งออกออเดอร์ รายการสินค้า วิธีชำระเงิน ยอดขาย ต้นทุน และกำไรของวันที่เลือก":
+      "Export orders, products, payment methods, sales, costs and profit for the selected date",
+    "พื้นที่จัดเก็บข้อมูล": "Data storage",
+    "กำลังตรวจสอบพื้นที่…": "Checking storage…",
+    "ระบบจะสำรองข้อมูลอัตโนมัติทุกครั้งที่บันทึก":
+      "Your data is automatically backed up whenever changes are saved",
+    "สำรองข้อมูลตอนนี้": "Back up now",
+    "ดาวน์โหลดไฟล์สำรอง": "Download backup file",
+    "ยังไม่มีการสำรองข้อมูล": "No backups yet",
+    "สำรองข้อมูลล่าสุด": "Last automatic backup",
+    "พื้นที่จัดเก็บ": "Storage",
+    "ใกล้เต็ม": "Nearly full",
+    "ปกติ": "Normal",
+    "ทั้งหมด": "All dates",
     ทุกหมวดหมู่: "All categories",
     เมนู: "Menu",
     ไม่บังคับ: "Optional",
@@ -6462,6 +6457,15 @@ updatePageLock();
     };
     renderers[active]?.();
     applyLanguage();
+    // Dynamic backup/status labels are not static DOM strings, so refresh them
+    // when the user changes language (without needing a page reload).
+    updateStorageStatus();
+    const exportModeLabel = document.getElementById("exportModeLabel");
+    if (exportModeLabel) {
+      exportModeLabel.textContent = document.getElementById("exportMode")?.checked
+        ? (language === "en" ? "All dates" : "ทั้งหมด")
+        : (language === "en" ? "Selected date" : "เลือกวัน");
+    }
     if (active === "reports") syncReportsLanguageLabels();
     speakLocalized(
       language === "en" ? "เปลี่ยนเป็นภาษาอังกฤษแล้ว" : "เปลี่ยนเป็นภาษาไทยแล้ว",
@@ -6480,3 +6484,9 @@ updatePageLock();
   window.applyLanguage = applyLanguage;
   applyLanguage();
 })();
+
+/* One-time upgrade: copy all existing menu images to IndexedDB on first load. */
+if (!window.__sdposHydratedData && window.SDPhotoStorage) {
+  window.SDPhotoStorage.persist(db);
+}
+window.SDPhotoStorage?.requestDurableStorage();

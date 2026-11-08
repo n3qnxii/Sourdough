@@ -13,12 +13,12 @@
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
-            .register("./service-worker.js?v=7.4")
+            .register("./service-worker.js?v=9.0")
             .catch(() => {});
         });
       }
     </script>
-    <link href="style.css?v=7.4" rel="stylesheet" />
+    <link href="style.css?v=9.0" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   </head>
   <body>
@@ -1290,7 +1290,7 @@
         </div>
       </div>
     </div>
-    <script defer src="app.js?v=7.4"></script>
+    
     <div
       class="modal hidden staffEditorModal"
       id="staffEditorModal"
@@ -1405,5 +1405,15 @@
         </div>
       </div>
     </div>
+    <script src="photo-storage.js?v=9.0"></script>
+    <script>
+      // Load saved photos before the POS renders so every image is available
+      // immediately after reload, including in iPad installed PWA mode.
+      window.SDPhotoStorage.boot().finally(() => {
+        const script = document.createElement('script');
+        script.src = 'app.js?v=9.0';
+        document.body.appendChild(script);
+      });
+    </script>
   </body>
 </html>

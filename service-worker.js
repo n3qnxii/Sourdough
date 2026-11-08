@@ -1,10 +1,11 @@
-const CACHE_NAME = "sourdough-pos-v8-14-reset-voice";
+const CACHE_NAME = "sourdough-pos-v10-backup-english";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
+  "./photo-storage.js",
   "./manifest.webmanifest",
   "./login-logo-transparent.png",
   "./assets/branding/login-bg.png",
